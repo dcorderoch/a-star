@@ -25,4 +25,3 @@ class solver:
                     self.priority_queue.put((child.dist, count, child))
         if not self.path:
             print("Goal is not possible!" + self.goal )
-        return self.path
