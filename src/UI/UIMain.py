@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'main.ui'
+# Form generated from reading UI file 'main.ui'
 ##
-## Created by: Qt User Interface Compiler version 5.15.1
+# Created by: Qt User Interface Compiler version 5.15.1
 ##
-## WARNING! All changes made in this file will be lost when recompiling UI file!
+# WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
 from PySide2.QtCore import *
@@ -118,7 +118,8 @@ class Ui_MainWindow(object):
         self.btnComodin4 = QPushButton(self.centralwidget)
         self.btnComodin4.setObjectName(u"btnComodin4")
         self.btnComodin4.setGeometry(QRect(720, 90, 111, 111))
-        self.btnComodin4.setStyleSheet(u"background-color: rgb(255, 255, 255);")
+        self.btnComodin4.setStyleSheet(
+            u"background-color: rgb(255, 255, 255);")
         self.btnComodin2 = QPushButton(self.centralwidget)
         self.btnComodin2.setObjectName(u"btnComodin2")
         self.btnComodin2.setGeometry(QRect(460, 90, 111, 111))
@@ -147,7 +148,7 @@ class Ui_MainWindow(object):
         self.btnShuffle.setObjectName(u"btnShuffle")
         self.btnShuffle.setGeometry(QRect(720, 720, 111, 31))
 
-        self.btnSaveFile= QPushButton(self.centralwidget)
+        self.btnSaveFile = QPushButton(self.centralwidget)
         self.btnSaveFile.setObjectName(u"btnSaveFile")
         self.btnSaveFile.setGeometry(QRect(330, 790, 111, 31))
 
@@ -158,7 +159,6 @@ class Ui_MainWindow(object):
         self.btnPlaySolution = QPushButton(self.centralwidget)
         self.btnPlaySolution.setObjectName(u"btnPlaySolution")
         self.btnPlaySolution.setGeometry(QRect(590, 790, 111, 31))
-
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
@@ -175,7 +175,8 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate(
+            "MainWindow", u"MainWindow", None))
         self.btn20.setText("")
         self.btn31.setText("")
         self.btn30.setText("")
@@ -192,36 +193,57 @@ class Ui_MainWindow(object):
         self.btn13.setText("")
         self.btn23.setText("")
         self.btn33.setText("")
-        self.btnRight4.setText(QCoreApplication.translate("MainWindow", u"Rotar Derecha", None))
-        self.btnRight2.setText(QCoreApplication.translate("MainWindow", u"Rotar Derecha", None))
-        self.btnRight1.setText(QCoreApplication.translate("MainWindow", u"Rotar Derecha", None))
-        self.btnRight3.setText(QCoreApplication.translate("MainWindow", u"Rotar Derecha", None))
-        self.btnLeft1.setText(QCoreApplication.translate("MainWindow", u"Rotar Izquierda", None))
-        self.btnLeft3.setText(QCoreApplication.translate("MainWindow", u"Rotar Izquierda", None))
-        self.btnLeft4.setText(QCoreApplication.translate("MainWindow", u"Rotar Izquierda", None))
-        self.btnLeft2.setText(QCoreApplication.translate("MainWindow", u"Rotar Izquierda", None))
+        self.btnRight4.setText(QCoreApplication.translate(
+            "MainWindow", u"Rotar Derecha", None))
+        self.btnRight2.setText(QCoreApplication.translate(
+            "MainWindow", u"Rotar Derecha", None))
+        self.btnRight1.setText(QCoreApplication.translate(
+            "MainWindow", u"Rotar Derecha", None))
+        self.btnRight3.setText(QCoreApplication.translate(
+            "MainWindow", u"Rotar Derecha", None))
+        self.btnLeft1.setText(QCoreApplication.translate(
+            "MainWindow", u"Rotar Izquierda", None))
+        self.btnLeft3.setText(QCoreApplication.translate(
+            "MainWindow", u"Rotar Izquierda", None))
+        self.btnLeft4.setText(QCoreApplication.translate(
+            "MainWindow", u"Rotar Izquierda", None))
+        self.btnLeft2.setText(QCoreApplication.translate(
+            "MainWindow", u"Rotar Izquierda", None))
         self.btnComodin3.setText("")
-        self.btnLeft0.setText(QCoreApplication.translate("MainWindow", u"Rotar Izquierda", None))
+        self.btnLeft0.setText(QCoreApplication.translate(
+            "MainWindow", u"Rotar Izquierda", None))
         self.btnComodin4.setText("")
         self.btnComodin2.setText("")
-        self.btnRight0.setText(QCoreApplication.translate("MainWindow", u"Rotar Derecha", None))
+        self.btnRight0.setText(QCoreApplication.translate(
+            "MainWindow", u"Rotar Derecha", None))
         self.btnComodin1.setText("")
 
-        self.btnLoadInitialConfig.setText(QCoreApplication.translate("MainWindow", u"Cargar Conf. Inicial", None))
+        self.btnLoadInitialConfig.setText(QCoreApplication.translate(
+            "MainWindow", u"Cargar Conf. Inicial", None))
         self.btnLoadInitialConfig.clicked.connect(self.btnLoadFileHandler)
 
-        self.btnLoadFinalConfig.setText(QCoreApplication.translate("MainWindow", u"Cargar Conf. Final", None))
+        self.btnLoadFinalConfig.setText(QCoreApplication.translate(
+            "MainWindow", u"Cargar Conf. Final", None))
 
-        self.btnResolve.setText(QCoreApplication.translate("MainWindow", u"Resolver", None))
+        self.btnResolve.setText(QCoreApplication.translate(
+            "MainWindow", u"Resolver", None))
 
-        self.btnShuffle.setText(QCoreApplication.translate("MainWindow", u"Shuffle", None))
+        self.btnShuffle.setText(QCoreApplication.translate(
+            "MainWindow", u"Shuffle", None))
 
-        self.btnSaveFile.setText(QCoreApplication.translate("MainWindow", u"Guardar Configu.", None))
+        self.btnSaveFile.setText(QCoreApplication.translate(
+            "MainWindow", u"Guardar Configu.", None))
 
-        self.btnIntruction.setText(QCoreApplication.translate("MainWindow", u"Ver Instrucciones", None))
+        self.btnIntruction.setText(QCoreApplication.translate(
+            "MainWindow", u"Ver Instrucciones", None))
 
-        self.btnPlaySolution.setText(QCoreApplication.translate("MainWindow", u"Play Solution", None))
+        self.btnPlaySolution.setText(QCoreApplication.translate(
+            "MainWindow", u"Play Solution", None))
     # retranslateUi
+
+    # Mostrar las instrucciones
+    def gameInfo():
+        return
 
     # Handler of the Load Button, to calls the file opener
     def btnLoadFileHandler(self):
