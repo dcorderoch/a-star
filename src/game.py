@@ -53,6 +53,7 @@ class Game():
         return
 
     def rotateRowRight(self, row):
+        rotated_row = list(range(Board.WIDTH))
         for i in range(Board.WIDTH):
             next_index = i + 1
             if i == (Board.WIDTH - 1):
@@ -70,6 +71,7 @@ class Game():
         self._board[row] = rotated_row
 
     def rotateRowLeft(self, row):
+        rotated_row = list(range(Board.WIDTH))
         for i in range(Board.WIDTH-1, -1, -1):
             next_index = i-1
             if i == 0:
@@ -89,7 +91,7 @@ class Game():
     # se encarga de rotar los valores del _board en la fila(row) seleccionada por la cantidad en rotation, en la direccion (0=izq, 1=derecha)
 
     def rotateRow(self, row, direction, rotation=1):
-        rotated_row = range(Board.WIDTH)
+        rotated_row = list(range(Board.WIDTH))
         # si se mueve a la izquierda
         if direction == BoardMoves.LEFT:
 
@@ -197,10 +199,12 @@ class Game():
 if __name__ == '__main__':
     game = Game()
 
-    # game.moveFreeSpaceDown()
-    # game.moveFreeSpaceDown()
-    # game.moveFreeSpaceDown()
-    game.moveFreeSpace(4, 3)
+    game.moveFreeSpaceDown()
+    game.moveFreeSpaceDown()
+    game.moveFreeSpaceDown()
+    game.rotateRowLeft(0)
+    game.rotateRowRight(1)
+    # game.moveFreeSpace(4, 2)
     print(game._board)
     # game.rotateRow(0, 0)
     # print(game._board)
@@ -211,6 +215,8 @@ if __name__ == '__main__':
     # game.rotateRow(3, 0)
     # print(game._board)
     # game.rotateRow(4, 1)
+    # a = list(range(0, 3))
+    # print(a)
     # print(game._board)
 
     print("el espacio vacio esta en la columna ",

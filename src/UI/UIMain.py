@@ -13,6 +13,15 @@ from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 
 
+class Colors():
+    red = "background-color: rgb(255, 103, 103);"
+    green = "background-color: rgb(0, 170, 127);"
+    blue = "background-color: rgb(88, 155, 255);"
+    yellow = "background-color: rgb(255, 255, 127);"
+    free_space = "background-color: rgb(255, 255, 255);"
+    unused_space = ""
+
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
@@ -23,67 +32,67 @@ class Ui_MainWindow(object):
         self.btn20 = QPushButton(self.centralwidget)
         self.btn20.setObjectName(u"btn20")
         self.btn20.setGeometry(QRect(330, 450, 111, 111))
-        self.btn20.setStyleSheet(u"background-color: rgb(255, 103, 103);")
-        self.btn31 = QPushButton(self.centralwidget)
-        self.btn31.setObjectName(u"btn31")
-        self.btn31.setGeometry(QRect(460, 570, 111, 111))
-        self.btn31.setStyleSheet(u"background-color: rgb(0, 170, 127);")
+        self.btn20.setStyleSheet(Colors.red)
         self.btn30 = QPushButton(self.centralwidget)
         self.btn30.setObjectName(u"btn30")
         self.btn30.setGeometry(QRect(330, 570, 111, 111))
-        self.btn30.setStyleSheet(u"background-color: rgb(255, 103, 103);")
+        self.btn30.setStyleSheet(Colors.red)
         self.btn00 = QPushButton(self.centralwidget)
         self.btn00.setObjectName(u"btn00")
         self.btn00.setGeometry(QRect(330, 210, 111, 111))
-        self.btn00.setStyleSheet(u"background-color: rgb(255, 103, 103);")
+        self.btn00.setStyleSheet(Colors.red)
         self.btn10 = QPushButton(self.centralwidget)
         self.btn10.setObjectName(u"btn10")
         self.btn10.setGeometry(QRect(330, 330, 111, 111))
-        self.btn10.setStyleSheet(u"background-color: rgb(255, 103, 103);")
+        self.btn10.setStyleSheet(Colors.red)
         self.btn01 = QPushButton(self.centralwidget)
         self.btn01.setObjectName(u"btn01")
         self.btn01.setGeometry(QRect(460, 210, 111, 111))
-        self.btn01.setStyleSheet(u"background-color: rgb(0, 170, 127);")
+        self.btn01.setStyleSheet(Colors.green)
         self.btn11 = QPushButton(self.centralwidget)
         self.btn11.setObjectName(u"btn11")
         self.btn11.setGeometry(QRect(460, 330, 111, 111))
-        self.btn11.setStyleSheet(u"background-color: rgb(0, 170, 127);")
+        self.btn11.setStyleSheet(Colors.green)
         self.btn21 = QPushButton(self.centralwidget)
         self.btn21.setObjectName(u"btn21")
         self.btn21.setGeometry(QRect(460, 450, 111, 111))
-        self.btn21.setStyleSheet(u"background-color: rgb(0, 170, 127);")
+        self.btn21.setStyleSheet(Colors.green)
+        self.btn31 = QPushButton(self.centralwidget)
+        self.btn31.setObjectName(u"btn31")
+        self.btn31.setGeometry(QRect(460, 570, 111, 111))
+        self.btn31.setStyleSheet(Colors.green)
         self.btn02 = QPushButton(self.centralwidget)
         self.btn02.setObjectName(u"btn02")
         self.btn02.setGeometry(QRect(590, 210, 111, 111))
-        self.btn02.setStyleSheet(u"background-color: rgb(88, 155, 255);")
+        self.btn02.setStyleSheet(Colors.blue)
         self.btn12 = QPushButton(self.centralwidget)
         self.btn12.setObjectName(u"btn12")
         self.btn12.setGeometry(QRect(590, 330, 111, 111))
-        self.btn12.setStyleSheet(u"background-color: rgb(88, 155, 255);")
+        self.btn12.setStyleSheet(Colors.blue)
         self.btn22 = QPushButton(self.centralwidget)
         self.btn22.setObjectName(u"btn22")
         self.btn22.setGeometry(QRect(590, 450, 111, 111))
-        self.btn22.setStyleSheet(u"background-color: rgb(88, 155, 255);")
+        self.btn22.setStyleSheet(Colors.blue)
         self.btn32 = QPushButton(self.centralwidget)
         self.btn32.setObjectName(u"btn32")
         self.btn32.setGeometry(QRect(590, 570, 111, 111))
-        self.btn32.setStyleSheet(u"background-color: rgb(88, 155, 255);")
+        self.btn32.setStyleSheet(Colors.blue)
         self.btn03 = QPushButton(self.centralwidget)
         self.btn03.setObjectName(u"btn03")
         self.btn03.setGeometry(QRect(720, 210, 111, 111))
-        self.btn03.setStyleSheet(u"background-color: rgb(255, 255, 127);")
+        self.btn03.setStyleSheet(Colors.yellow)
         self.btn13 = QPushButton(self.centralwidget)
         self.btn13.setObjectName(u"btn13")
         self.btn13.setGeometry(QRect(720, 330, 111, 111))
-        self.btn13.setStyleSheet(u"background-color: rgb(255, 255, 127);")
+        self.btn13.setStyleSheet(Colors.yellow)
         self.btn23 = QPushButton(self.centralwidget)
         self.btn23.setObjectName(u"btn23")
         self.btn23.setGeometry(QRect(720, 450, 111, 111))
-        self.btn23.setStyleSheet(u"background-color: rgb(255, 255, 127);")
+        self.btn23.setStyleSheet(Colors.yellow)
         self.btn33 = QPushButton(self.centralwidget)
         self.btn33.setObjectName(u"btn33")
         self.btn33.setGeometry(QRect(720, 570, 111, 111))
-        self.btn33.setStyleSheet(u"background-color: rgb(255, 255, 127);")
+        self.btn33.setStyleSheet(Colors.yellow)
         self.btnRight4 = QPushButton(self.centralwidget)
         self.btnRight4.setObjectName(u"btnRight4")
         self.btnRight4.setGeometry(QRect(870, 610, 111, 31))
@@ -111,26 +120,25 @@ class Ui_MainWindow(object):
         self.btnComodin3 = QPushButton(self.centralwidget)
         self.btnComodin3.setObjectName(u"btnComodin3")
         self.btnComodin3.setGeometry(QRect(590, 90, 111, 111))
-        self.btnComodin3.setStyleSheet(u"")
+        self.btnComodin3.setStyleSheet(Colors.unused_space)
         self.btnLeft0 = QPushButton(self.centralwidget)
         self.btnLeft0.setObjectName(u"btnLeft0")
         self.btnLeft0.setGeometry(QRect(184, 130, 111, 31))
         self.btnComodin4 = QPushButton(self.centralwidget)
         self.btnComodin4.setObjectName(u"btnComodin4")
         self.btnComodin4.setGeometry(QRect(720, 90, 111, 111))
-        self.btnComodin4.setStyleSheet(
-            u"background-color: rgb(255, 255, 255);")
+        self.btnComodin4.setStyleSheet(Colors.free_space)
         self.btnComodin2 = QPushButton(self.centralwidget)
         self.btnComodin2.setObjectName(u"btnComodin2")
         self.btnComodin2.setGeometry(QRect(460, 90, 111, 111))
-        self.btnComodin2.setStyleSheet(u"")
+        self.btnComodin2.setStyleSheet(Colors.unused_space)
         self.btnRight0 = QPushButton(self.centralwidget)
         self.btnRight0.setObjectName(u"btnRight0")
         self.btnRight0.setGeometry(QRect(870, 130, 111, 31))
         self.btnComodin1 = QPushButton(self.centralwidget)
         self.btnComodin1.setObjectName(u"btnComodin1")
         self.btnComodin1.setGeometry(QRect(330, 90, 111, 111))
-        self.btnComodin1.setStyleSheet(u"")
+        self.btnComodin1.setStyleSheet(Colors.unused_space)
 
         self.btnLoadInitialConfig = QPushButton(self.centralwidget)
         self.btnLoadInitialConfig.setObjectName(u"btnLoadInitialConfig")
@@ -170,6 +178,12 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
+
+        self.board_buttons = [[self.btnComodin1, self.btnComodin2, self.btnComodin3, self.btnComodin4],
+                              [self.btn00, self.btn01, self.btn02, self.btn03],
+                              [self.btn10, self.btn11, self.btn12, self.btn13],
+                              [self.btn20, self.btn21, self.btn22, self.btn23],
+                              [self.btn30, self.btn31, self.btn32, self.btn33]]
 
         QMetaObject.connectSlotsByName(MainWindow)
     # setupUi
