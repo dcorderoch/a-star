@@ -80,8 +80,8 @@ class Game():
 
         # mover puntero a espacio vacio
         if self._free_space.row == row:
-            if(self._free_space.col - 1 < 0):
-                self._free_space.col = Board.WIDTH
+            if(self._free_space.col == 0):
+                self._free_space.col = Board.WIDTH - 1
             else:
                 self._free_space.col = self._free_space.col - 1
 
