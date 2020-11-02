@@ -185,6 +185,25 @@ class Ui_MainWindow(object):
         self.btnPlaySolution.setObjectName(u"btnPlaySolution")
         self.btnPlaySolution.setGeometry(QRect(590, 790, 111, 31))
 
+        self.btnSaveConfiguration = QPushButton(self.centralwidget)
+        self.btnSaveConfiguration.setObjectName(u"btnSaveConfiguration")
+        self.btnSaveConfiguration.setGeometry(QRect(720, 790, 111, 31))
+
+        self.btnPreviousStep = QPushButton(self.centralwidget)
+        self.btnPreviousStep.setObjectName(u"btnPreviousStep")
+        self.btnPreviousStep.setGeometry(QRect(330, 860, 111, 31))
+        self.btnPreviousStep.setEnabled(False)
+
+        self.btnNextStep = QPushButton(self.centralwidget)
+        self.btnNextStep.setObjectName(u"btnNextStep")
+        self.btnNextStep.setGeometry(QRect(460, 860, 111, 31))
+        self.btnNextStep.setEnabled(False)
+
+        self.btnFirstStep = QPushButton(self.centralwidget)
+        self.btnFirstStep.setObjectName(u"btnFirstStep")
+        self.btnFirstStep.setGeometry(QRect(590, 860, 111, 31))
+        self.btnFirstStep.setEnabled(False)
+
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
@@ -276,11 +295,38 @@ class Ui_MainWindow(object):
 
         self.btnIntruction.setText(QCoreApplication.translate(
             "MainWindow", u"Ver Instrucciones", None))
+        self.btnIntruction.clicked.connect(self.btnIntructionHandler)
 
         self.btnPlaySolution.setText(QCoreApplication.translate(
             "MainWindow", u"Play Solution", None))
+
+        self.btnSaveConfiguration.setText(QCoreApplication.translate(
+            "MainWindow", u"Guardar Conf. Final", None))
+
+        self.btnNextStep.setText(QCoreApplication.translate(
+            "MainWindow", u"Paso Siguiente", None))
+
+        self.btnPreviousStep.setText(QCoreApplication.translate(
+            "MainWindow", u"Paso Anterior", None))
+
+        self.btnFirstStep.setText(QCoreApplication.translate(
+            "MainWindow", u"Paso Inicial", None))
     # retranslateUi
 
     # Mostrar las instrucciones
     def gameInfo():
         return
+
+    def btnIntructionHandler(self):
+        print("Instruction Button pressed")
+        self.showIntructions()
+
+    def showIntructions(self):
+        msg = QMessageBox(self)
+        msg.setText("Posibles Movimientos")
+        msg.setInformativeText(
+            "1) Rotar Derecha: Desplaza a la derecha un espacio cada pieza en una fila\n"
+            "2) Rotar Izquierda: Desplazar a la Izquierda un espacio cada pieza en una fila\n"
+            "3) Desplazamiento Vertical: Desplazar el espacio en blanco de manera vertical 1,2,3 o 4 espacios (Columnas)")
+        msg.setWindowTitle("Instrucciones de Juego")
+        ret = msg.exec_()
