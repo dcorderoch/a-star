@@ -1,6 +1,7 @@
 from enum import Enum
 import json
 from PySide2.QtWidgets import QFileDialog
+from PySide2.QtWidgets import *
 
 
 class Board():
@@ -39,7 +40,7 @@ class Game():
     BLUE = "2"
     YELLOW = "3"
 
-    def loadFile(self):
+    def loadFile(self, ui, property):
         filename = QFileDialog.getOpenFileName()
         path = filename[0]
 
@@ -47,22 +48,30 @@ class Game():
             print('file:', path)
             with open(path, "r") as config:
                 json_file = json.load(config)
-                self.loadConfig(json_file['init'])
+                if property == "init":
+                    self._board = self.loadConfig(json_file['init'], ui)
+                elif property == "goal":
+                    self._final_board = self.loadConfig(json_file['goal'], ui)
 
     # se encarga de cargar la configuración de un archivo .txt, carga configuración final e inicial (crear otra si es necesario)
-    def loadConfig(self, config):
-        if self.validate_configuration(config) == False:
-            return
+    def loadConfig(self, config, ui):
+        if self.validate_configuration(config, ui) == False:
+            self.reset_board()
+            return self._board
 
+        newBoard = [[Board.NOT_USED, Board.NOT_USED, Board.NOT_USED, Board.FREE_SPACE], [
+            0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
         row = 0
         for line in config:
             column = 0
 
             for element in line:
-                self.set_color(row, column, element)
+                self.set_color(row, column, element, newBoard)
                 column += 1
 
             row += 1
+
+        return newBoard
 
     def reset_board(self):
         self._board = [[Board.NOT_USED, Board.NOT_USED, Board.NOT_USED, Board.FREE_SPACE],
@@ -71,12 +80,20 @@ class Game():
                        [Board.TOKEN1, Board.TOKEN2, Board.TOKEN3, Board.TOKEN4],
                        [Board.TOKEN1, Board.TOKEN2, Board.TOKEN3, Board.TOKEN4]]
 
-    def validate_configuration(self, configuration):
+    def reading_error(self, message, ui):
+        msg = QMessageBox(ui)
+        msg.setText("Error al leer el archivo")
+        msg.setInformativeText(message)
+        msg.setWindowTitle("Error")
+        ret = msg.exec_()
+
+    def validate_configuration(self, configuration, ui):
         counter = {self.RED: 0, self.GREEN: 0, self.BLUE: 0, self.YELLOW: 0}
         if len(configuration) == 4:
             for row in configuration:
                 if len(row) != 4:
-                    print("Error: There are not 4 elements in a row")
+                    self.reading_error(
+                        "Error: Se encontro una fila que no contiene 4 elementos", ui)
                     return False
                 else:
                     for column in row:
@@ -90,33 +107,36 @@ class Game():
                             elif column == 3:
                                 counter[self.YELLOW] += 1
                             else:
-                                print("Error: Invalid value, found: " + str(column))
+                                self.reading_error(
+                                    "Error: Se encontro un valor invalido: " + str(column), ui)
                                 return False
                         else:
-                            print("Error: Invalid value, found: " + str(column))
+                            self.reading_error(
+                                "Error: Se encontro un valor invalido: " + str(column), ui)
                             return False
 
             if counter["0"] != 4 or counter["1"] != 4 or counter["1"] != 4 or counter["1"] != 4:
-                print("Error: There are not the required number of colors in the suplied configuration. There must be exactly 4 occurrences of each color")
+                self.reading_error(
+                    "Error: No hay la cantidad requerida de bolas por color en la configuracion dada. Tienen que haber exactamente 4 elementos por cada color.", ui)
                 return False
 
             return True
         else:
-            print("Error: There are not 4 rows")
+            self.reading_error("Error: No hay 4 filas", ui)
             return False
 
-    def set_color(self, row, column, colorCode):
+    def set_color(self, row, column, colorCode, board):
         if str(colorCode) == self.RED:
-            self._board[row+1][column] = Board.TOKEN1
+            board[row+1][column] = Board.TOKEN1
 
         elif str(colorCode) == self.GREEN:
-            self._board[row+1][column] = Board.TOKEN2
+            board[row+1][column] = Board.TOKEN2
 
         elif str(colorCode) == self.BLUE:
-            self._board[row+1][column] = Board.TOKEN3
+            board[row+1][column] = Board.TOKEN3
 
         elif str(colorCode) == self.YELLOW:
-            self._board[row+1][column] = Board.TOKEN4
+            board[row+1][column] = Board.TOKEN4
 
     # se encarga de guardar la configuración en un archivo de .txt
     def saveConfig(self):

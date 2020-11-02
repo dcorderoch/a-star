@@ -37,7 +37,11 @@ class UI(UIMain.Ui_MainWindow, QMainWindow):
                 self.board_buttons[y][x].clicked.connect(
                     lambda row=y, col=x: self.boardBtnHandler(row, col))
 
-        self.btnLoadInitialConfig.clicked.connect(self.btnLoadFileHandler)
+        self.btnLoadInitialConfig.clicked.connect(lambda:
+                                                  self.btnLoadFileHandler("init"))
+        self.btnLoadFinalConfig.clicked.connect(lambda:
+                                                self.btnLoadFileHandler("goal"))
+        self.btnSaveFile.clicked.connect(self.btnSaveFileHandler)
 
     def leftBtnHandler(self, row):
         self.game.rotateRowLeft(row)
@@ -60,9 +64,12 @@ class UI(UIMain.Ui_MainWindow, QMainWindow):
                     self.token_colors[self.game._board[y][x]])
         pass
 
-    def btnLoadFileHandler(self):
-        self.game.loadFile()
+    def btnLoadFileHandler(self, boardType):
+        self.game.loadFile(self, boardType)
         self.redrawBoard()
+
+    def btnSaveFileHandler(self):
+        print("Saving file")
 
 
 if __name__ == '__main__':
