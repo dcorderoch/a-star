@@ -1,5 +1,5 @@
 from queue import SimpleQueue as queue
-from state_board import StateBoard
+from state_board import StateBoard, Position
 
 class BoardSolver:
     def __init__(self, start, goal):

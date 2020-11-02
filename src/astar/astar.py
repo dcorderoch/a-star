@@ -2,6 +2,7 @@ from StringSolver import StringSolver
 from BoardSolver import BoardSolver
 
 def main():
+    print('print string A*')
     start = 'eham'
     goal = 'mahe'
     a = StringSolver(start, goal)
@@ -9,7 +10,7 @@ def main():
     for i, s in enumerate(a.path):
         print(f'{i}) {s}')
     # very simple case
-    print('now to print the board solution')
+    print('print Board A*')
     start = [[-1, 1, 1, 1, 1], [-1, 2, 2, 2, 2], [-1, 3, 3, 3, 3], [4, 4, 4, 4, 0]]
     goal = [[-1, 1, 1, 1, 1], [-1, 2, 2, 2, 2], [-1, 3, 3, 3, 3], [0, 4, 4, 4, 4]]
     print(f'new start: {start}')
