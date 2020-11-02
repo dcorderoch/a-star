@@ -1,9 +1,9 @@
-class state(object):
+class State(object):
     def __init__(self, value, parent, start = 0, goal = 0):
         self.children = []
         self.parent = parent
         self.value = value
-        self.dist = 0
+        self.distance = 0
         if parent:
             self.start = parent.start
             self.goal = parent.goal
