@@ -1,4 +1,5 @@
-# coding=utf-8
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 class Board():
     NOT_USED = -1
@@ -10,18 +11,15 @@ class Board():
     WIDTH = 4
     HEIGTH = 5
 
-
 class BoardMoves():
     RIGHT = 1
     LEFT = 0
     MV_WHTSPC = 2
 
-
 class Position():
     def __init__(self, x, y):
         self.col = x
         self.row = y
-
 
 class Game():
     def __init__(self):
@@ -62,10 +60,9 @@ class Game():
 
         # mover puntero a espacio vacio
         if self._free_space.row == row:
-            if(self._free_space.col + 1 == Board.WIDTH):
+            self._free_space.col += 1
+            if self._free_space.col == Board.WIDTH:
                 self._free_space.col = 0
-            else:
-                self._free_space.col = self._free_space.col + 1
 
         # hacer el cambio
         self._board[row] = rotated_row
@@ -80,10 +77,9 @@ class Game():
 
         # mover puntero a espacio vacio
         if self._free_space.row == row:
-            if(self._free_space.col == 0):
+            self._free_space.col -= 1
+            if self._free_space.col < 0:
                 self._free_space.col = Board.WIDTH - 1
-            else:
-                self._free_space.col = self._free_space.col - 1
 
         # hacer el cambio
         self._board[row] = rotated_row
@@ -103,10 +99,9 @@ class Game():
 
             # move free_space pointer
             if self._free_space.row == row:
-                if(self._free_space.col - 1 < 0):
+                self._free_space.col -= 1
+                if self._free_space.col < 0:
                     self._free_space.col = Board.WIDTH
-                else:
-                    self._free_space.col = self._free_space.col - 1
         # si se mueve a la derecha
         elif direction == BoardMoves.RIGHT:
 
@@ -118,10 +113,9 @@ class Game():
 
             # move free_space pointer
             if self._free_space.row == row:
-                if(self._free_space.col + 1 == Board.WIDTH):
+                self._free_space.col += 1
+                if self._free_space.col == Board.WIDTH:
                     self._free_space.col = 0
-                else:
-                    self._free_space.col = self._free_space.col + 1
         else:
             print("Error, no indicó dirección derecha o izquierda")
             return
@@ -173,9 +167,8 @@ class Game():
             return
         self._board[self._free_space.row][self._free_space.col] = self._board[self._free_space.row +
                                                                               1][self._free_space.col]
-        self._board[self._free_space.row +
-                    1][self._free_space.col] = Board.FREE_SPACE
-        self._free_space.row = self._free_space.row + 1
+        self._board[self._free_space.row + 1][self._free_space.col] = Board.FREE_SPACE
+        self._free_space.row += 1
 
     def moveFreeSpaceUP(self):
         if self._free_space.row - 1 < 0:
@@ -187,14 +180,12 @@ class Game():
             return
         self._board[self._free_space.row][self._free_space.col] = self._board[self._free_space.row -
                                                                               1][self._free_space.col]
-        self._board[self._free_space.row -
-                    1][self._free_space.col] = Board.FREE_SPACE
-        self._free_space.row = self._free_space.row - 1
+        self._board[self._free_space.row - 1][self._free_space.col] = Board.FREE_SPACE
+        self._free_space.row -= 1
 
         # Se ejecutan los movimientos de la solución uno a uno (PROBABLEMENTE VA EN LA CLASE DE UI!!!)
     def playSolution(self):
         return
-
 
 if __name__ == '__main__':
     game = Game()

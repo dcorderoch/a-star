@@ -8,6 +8,7 @@ class BoardSolver:
         self.queue = queue()
         self.start = start
         self.goal = goal
+        self.free_space = Position(x = 3, y = 0)
     def solve(self):
         start_state = StateBoard(self.start, 0, self.start, self.goal)
         count = 0

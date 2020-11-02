@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 ################################################################################
 # Form generated from reading UI file 'main.ui'
 ##
@@ -12,7 +10,6 @@ from PySide2.QtCore import *
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 
-
 class Colors():
     red = "background-color: rgb(255, 103, 103);"
     green = "background-color: rgb(0, 170, 127);"
@@ -20,7 +17,6 @@ class Colors():
     yellow = "background-color: rgb(255, 255, 127);"
     free_space = "background-color: rgb(255, 255, 255);"
     unused_space = ""
-
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):

@@ -1,4 +1,3 @@
-
 from PySide2.QtCore import *
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
@@ -7,7 +6,6 @@ from UI import UIMain
 from UI.UIMain import Colors
 
 from game import *
-
 
 class UI(UIMain.Ui_MainWindow, QMainWindow):
     def __init__(self):
@@ -57,7 +55,6 @@ class UI(UIMain.Ui_MainWindow, QMainWindow):
                 self.board_buttons[y][x].setStyleSheet(
                     self.token_colors[self.game._board[y][x]])
         pass
-
 
 if __name__ == '__main__':
     app = QApplication()
