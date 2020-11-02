@@ -5,6 +5,7 @@ from PySide2.QtWidgets import *
 from PySide2 import QtWidgets
 from UI import UIMain
 
+
 from game import *
 
 
@@ -14,11 +15,8 @@ class UI(UIMain.Ui_MainWindow, QtWidgets.QMainWindow):
         self.game = Game()
         self.setupUi(self)
         self.set_button_handlers()
-
-    def set_button_handlers(self):
-        self.btnLoadInitialConfig.clicked.connect(self.btnLoadFileHandler)
-
     # Handler of the Load Button, to calls the file opener
+
     def btnLoadFileHandler(self):
         print("Button pressed")
         self.openFileOpener()

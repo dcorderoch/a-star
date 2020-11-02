@@ -13,6 +13,15 @@ from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 
 
+class Colors():
+    red = "background-color: rgb(255, 103, 103);"
+    green = "background-color: rgb(0, 170, 127);"
+    blue = "background-color: rgb(88, 155, 255);"
+    yellow = "background-color: rgb(255, 255, 127);"
+    free_space = "background-color: rgb(255, 255, 255);"
+    unused_space = ""
+
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
@@ -128,26 +137,25 @@ class Ui_MainWindow(object):
         self.btnComodin3 = QPushButton(self.centralwidget)
         self.btnComodin3.setObjectName(u"btnComodin3")
         self.btnComodin3.setGeometry(QRect(590, 90, 111, 111))
-        self.btnComodin3.setStyleSheet(u"")
+        self.btnComodin3.setStyleSheet(Colors.unused_space)
         self.btnLeft0 = QPushButton(self.centralwidget)
         self.btnLeft0.setObjectName(u"btnLeft0")
         self.btnLeft0.setGeometry(QRect(184, 130, 111, 31))
         self.btnComodin4 = QPushButton(self.centralwidget)
         self.btnComodin4.setObjectName(u"btnComodin4")
         self.btnComodin4.setGeometry(QRect(720, 90, 111, 111))
-        self.btnComodin4.setStyleSheet(
-            u"background-color: rgb(255, 255, 255);")
+        self.btnComodin4.setStyleSheet(Colors.free_space)
         self.btnComodin2 = QPushButton(self.centralwidget)
         self.btnComodin2.setObjectName(u"btnComodin2")
         self.btnComodin2.setGeometry(QRect(460, 90, 111, 111))
-        self.btnComodin2.setStyleSheet(u"")
+        self.btnComodin2.setStyleSheet(Colors.unused_space)
         self.btnRight0 = QPushButton(self.centralwidget)
         self.btnRight0.setObjectName(u"btnRight0")
         self.btnRight0.setGeometry(QRect(870, 130, 111, 31))
         self.btnComodin1 = QPushButton(self.centralwidget)
         self.btnComodin1.setObjectName(u"btnComodin1")
         self.btnComodin1.setGeometry(QRect(330, 90, 111, 111))
-        self.btnComodin1.setStyleSheet(u"")
+        self.btnComodin1.setStyleSheet(Colors.unused_space)
 
         self.btnLoadInitialConfig = QPushButton(self.centralwidget)
         self.btnLoadInitialConfig.setObjectName(u"btnLoadInitialConfig")
@@ -192,6 +200,12 @@ class Ui_MainWindow(object):
                        [self.btn30, self.btn31, self.btn32, self.btn33]]
 
         self.retranslateUi(MainWindow)
+
+        self.board_buttons = [[self.btnComodin1, self.btnComodin2, self.btnComodin3, self.btnComodin4],
+                              [self.btn00, self.btn01, self.btn02, self.btn03],
+                              [self.btn10, self.btn11, self.btn12, self.btn13],
+                              [self.btn20, self.btn21, self.btn22, self.btn23],
+                              [self.btn30, self.btn31, self.btn32, self.btn33]]
 
         QMetaObject.connectSlotsByName(MainWindow)
     # setupUi
