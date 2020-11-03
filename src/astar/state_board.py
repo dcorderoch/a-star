@@ -18,11 +18,22 @@ class StateBoard(State):
         self.distance = self.get_distance()
         self.free_space = free_space
     def get_distance(self): # still gotta fix this
-        if self.value == self.goal:
-            return 0
         distance = 0
-        for i, letter in enumerate(self.goal):
-            distance += abs(i - self.value.index(letter))
+        if self.value == self.goal:
+            return distance
+        if self.distance != 0:
+            return distance
+        for i, row in enumerate(self.value):
+            for j, cell in enumerate(row):
+                if cell == -1:
+                    continue
+                if cell == 0:
+                    distance += 2 + i + j
+                    continue
+                distance += (abs(cell - j) - 1)
+        if self.parent:
+            distance += self.parent.get_distance()
+        self.distance = distance
         return distance
     def create_children(self):
         if self.children == []:
@@ -41,6 +52,12 @@ class StateBoard(State):
             if self.free_space.col - steps < 1:
                 continue
             tmp = self.move_free_space_up(steps)
+            if tmp != None:
+                self.children.append(tmp)
+        for steps in range(Board.H):
+            if self.free_space.col + steps > Board.H:
+                continue
+            tmp = self.move_free_space_down(steps)
             if tmp != None:
                 self.children.append(tmp)
     def rotate_row_right(self, row):
@@ -87,5 +104,18 @@ class StateBoard(State):
         y = self.free_space.row - steps
         x = self.free_space.col
         new_p = Position(x, y)
-        child = StateBoard(newvalue, self, start = self.start, goal = self.goal, free_space = new_p)
-        return child
+        return StateBoard(newvalue, self, start = self.start, goal = self.goal, free_space = new_p)
+    def move_free_space_down(self, steps):
+        if self.free_space.col + steps > Board.H:
+            return None
+        if self.free_space.col == Board.H - 1:
+            return None
+        newvalue = create_board_w_space_down(self.value, self.free_space.row, self.free_space.col)
+        steps_left = steps - 1
+        while steps_left > 0:
+            newvalue = create_board_w_space_down(newvalue, self.free_space.row + 1, self.free_space.col)
+            steps_left -= 1
+        y = self.free_space.row + steps
+        x = self.free_space.col
+        new_p = Position(x, y)
+        return StateBoard(newvalue, self, start = self.start, goal = self.goal, free_space = new_p)

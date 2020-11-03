@@ -13,6 +13,8 @@ class State(object):
             self.path = [value]
             self.start = start
             self.goal = goal
+    def __repr__(self):
+        return f'State({self.value})'
     def get_distance(self):
         pass
     def create_children(self):
