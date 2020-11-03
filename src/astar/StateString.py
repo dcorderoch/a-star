@@ -4,6 +4,10 @@ class StateString(State):
     def __init__(self, value, parent, start = 0, goal = 0):
         super(StateString, self).__init__(value, parent, start, goal)
         self.distance = self.get_distance()
+    def __repr__(self):
+        return f'StringState({self.value})'
+    def __str__(self):
+        return f'StringState({self.value})'
     def get_distance(self):
         if self.value == self.goal:
             return 0

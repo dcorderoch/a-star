@@ -17,8 +17,19 @@ class StateBoard(State):
         super(StateBoard, self).__init__(value, parent, start, goal)
         self.distance = self.get_distance()
         self.free_space = free_space
+    def __repr__(self):
+        return f'BoardState({self.value})'
+    def __eq__(self, other):
+        if other == None:
+            return False
+        print(f'StateBoard.__eq__(self, other), self.value:{self.value}, other.value:{other.value}')
+        return self.value == other.value
+    def __str__(self):
+        return f'BoardState({self.value})'
     def get_distance(self): # still gotta fix this
         distance = 0
+        print(f'StateBoard.get_distance()')
+        print(f'self.value:{self.value}, self.goal:{self.goal}')
         print(f'self.value == self.goal is {self.value == self.goal}')
         if self.value == self.goal:
             return distance
@@ -35,9 +46,10 @@ class StateBoard(State):
         if self.parent:
             distance += self.parent.get_distance()
         self.distance = distance
+        print(f'self.distance:{self.distance}')
         return distance
     def create_children(self):
-        if self.children == []:
+        if self.children != []:
             return
         for row in range(Board.W):
             if row == self.free_space.row:
@@ -69,8 +81,8 @@ class StateBoard(State):
         newvalue = self.value[:] # deep copy of the current value
         newvalue[row] = rotated_row
         y = self.free_space.row
-        x = self.free_space.col + 1 * (col == self.free_space.col)
-        new_p = Position(x, y)
+        x = self.free_space.col + 1 * (row == self.free_space.row)
+        new_p = Position(x=x, y=y)
         child = StateBoard(value=newvalue, parent=self, start=self.start, goal=self.goal, free_space=new_p)
         return child
     def rotate_row_left(self, row):
@@ -81,13 +93,18 @@ class StateBoard(State):
         newvalue = self.value[:] # deep copy of the current value
         newvalue[row] = rotated_row
         y = self.free_space.row
-        x = self.free_space.col - 1 * (col == self.free_space.col)
-        new_p = Position(x, y)
-        child = StateBoard(value,newvalue, parent=self, start=self.start, goal=self.goal, free_space=new_p)
+        x = self.free_space.col - 1 * (row == self.free_space.row)
+        new_p = Position(x=x, y=y)
+        child = StateBoard(value=newvalue, parent=self, start=self.start, goal=self.goal, free_space=new_p)
         return child
     def create_board_w_space_up(self, board, row, col):
         newvalue = board[:] # deep copy of the current value
         newvalue[row][col] = newvalue[row - 1][col]
+        newvalue[row - 1][col] = 0
+        return newvalue
+    def create_board_w_space_down(self, board, row, col):
+        newvalue = board[:] # deep copy of the current value
+        newvalue[row][col] = newvalue[row + 1][col]
         newvalue[row - 1][col] = 0
         return newvalue
     def move_free_space_up(self, steps):
@@ -97,28 +114,28 @@ class StateBoard(State):
             return None
         if self.value[self.free_space.row - 1][self.free_space.col] == -1:
             return None
-        newvalue = create_board_w_space_up(self.value, self.free_space.row, self.free_space.col)
+        newvalue = self.create_board_w_space_up(self.value, self.free_space.row, self.free_space.col)
         steps_left = steps - 1
         while steps_left > 0:
-            newvalue = create_board_w_space_up(newvalue, self.free_space.row - 1, self.free_space.col)
+            newvalue = self.create_board_w_space_up(newvalue, self.free_space.row - 1, self.free_space.col)
             steps_left -= 1
         y = self.free_space.row - steps
         x = self.free_space.col
-        new_p = Position(x, y)
+        new_p = Position(x=x, y=y)
         return StateBoard(value=newvalue, parent=self, start=self.start, goal=self.goal, free_space=new_p)
     def move_free_space_down(self, steps):
         if self.free_space.col + steps > Board.H:
             return None
         if self.free_space.col == Board.H - 1:
             return None
-        newvalue = create_board_w_space_down(self.value, self.free_space.row, self.free_space.col)
+        newvalue = self.create_board_w_space_down(self.value, self.free_space.row, self.free_space.col)
         steps_left = steps - 1
         while steps_left > 0:
-            newvalue = create_board_w_space_down(newvalue, self.free_space.row + 1, self.free_space.col)
+            newvalue = self.create_board_w_space_down(newvalue, self.free_space.row + 1, self.free_space.col)
             steps_left -= 1
         y = self.free_space.row + steps
         x = self.free_space.col
-        new_p = Position(x, y)
+        new_p = Position(x=x, y=y)
         return StateBoard(value=newvalue, parent=self, start=self.start, goal=self.goal, free_space=new_p)
 
 from queue import SimpleQueue as queue
@@ -132,22 +149,25 @@ class BoardSolver:
         self.goal = goal
         self.free_space = Position(x = 3, y = 0)
     def solve(self):
-        print(f'solve()')
+        print(f'BoardSolver.solve()')
         start_state = StateBoard(value=self.start, parent=None, start=self.start, goal=self.goal)
         print(f'start_state:{start_state}')
         count = 0
         self.queue.put((0, count, start_state))
         while not self.path and self.queue.qsize():
             closest_children = self.queue.get()[2]
+            print(f'closest_children:{closest_children}')
             closest_children.create_children()
-            print(f'child: {closest_children.value}')
+            for i, child in enumerate(closest_children.children):
+                print(f'child No. {i+1}:{child}')
+            print(f'child is {closest_children.value}')
             self.visited_queue.append(closest_children.value)
             for child in closest_children.children:
                 if child.value not in self.visited_queue:
-                    cound += 1
-                    if not child.dist:
+                    count += 1
+                    if not child.distance:
                         self.path = child.path
                         break
-                    self.queue.put((child.dist, cound, child))
+                    self.queue.put((child.distance, count, child))
         if not self.path:
             print('goal is not possible', self.goal )

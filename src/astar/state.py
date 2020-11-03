@@ -14,7 +14,11 @@ class State(object):
             self.start = start
             self.goal = goal
     def __repr__(self):
-        return f'State({self.value})'
+        pass
+    def __eq__(self, other):
+        pass
+    def __str__(self):
+        pass
     def get_distance(self):
         pass
     def create_children(self):
