@@ -1,5 +1,5 @@
 from StringSolver import StringSolver
-from BoardSolver import BoardSolver
+from board import BoardSolver
 
 def main():
     print('print string A*')
@@ -20,5 +20,5 @@ def main():
     for i, s in enumerate(b.path):
         print(f'{i}) {s}')
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
