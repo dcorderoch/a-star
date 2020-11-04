@@ -1,4 +1,4 @@
-from queue import SimpleQueue as queue
+from queue import PriorityQueue as queue
 from StateString import StateString
 
 class StringSolver:

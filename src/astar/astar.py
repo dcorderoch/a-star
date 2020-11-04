@@ -12,11 +12,12 @@ def main():
     # very simple case
     print('print Board A*')
     start = [[-1, -1, -1, 0], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]]
-    goal = [[-1, -1, -1, 0], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [2, 3, 4, 1]]
+    goal =  [[-1, -1, -1, 0], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [4, 1, 2, 3]]
     print(f'new start: {start}')
     print(f'new goal: {goal}')
     b = BoardSolver(start, goal)
     b.solve()
+    print(f'the path is:{b.path}')
     for i, s in enumerate(b.path):
         print(f'{i}) {s}')
 
