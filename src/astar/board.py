@@ -16,8 +16,8 @@ class Board(IntEnum):
 class StateBoard(State):
     def __init__(self, *, value, parent, start = 0, goal = 0, free_space = Position(x=3,y=0)):
         super(StateBoard, self).__init__(value, parent, start, goal)
-        self.distance = self.get_distance()
         self.free_space = free_space
+        self.get_distance()
     def __repr__(self):
         return f'BoardState({self.value})'
     def __eq__(self, other):
@@ -41,9 +41,15 @@ class StateBoard(State):
                 if cell == -1:
                     continue
                 if cell == 0:
-                    distance += 2 + i + j
+                    if self.parent:
+                        space_distance = 2 * abs(self.free_space.row - self.parent.free_space.row) + 3 * abs(self.free_space.col - self.parent.free_space.col)
+                    else:
+                        space_distance = 2 * abs(self.free_space.row - 0 ) + 3 * abs(self.free_space.col - 3)
+                    distance += space_distance
                     continue
-                distance += (abs(cell - j) - 1)
+                cell_distance = abs(cell - j) -1
+                if cell_distance > 0:
+                    distance += cell_distance
         if self.parent:
             distance += self.parent.get_distance()
         self.distance = distance
@@ -217,7 +223,7 @@ class BoardSolver:
                         self.path = child.path
                         print('------------------------------------')
                         break
-                    if child.distance == 0:
+                    if child.distance == 0 and child.value == self.goal:
                         print('distance == 0')
                         print(f'current path:{self.path}, new path:{child.path}')
                         self.path = child.path
@@ -226,4 +232,10 @@ class BoardSolver:
                     self.queue.put((child.distance, count, child))
             print('exited the for')
         if not self.path:
-            print('goal is not possible', self.goal )
+            print('start')
+            for row in self.start:
+                print(f'{row}')
+            print('start')
+            for row in self.goal:
+                print(f'{row}')
+            print('is not possible?')
