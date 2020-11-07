@@ -48,11 +48,12 @@ class StateBoard(State):
         if self.distance != 0:
             return self.distance # it has already been calculated
         distance = 0
+        zeros = 0
         for i in range(len(self.row_sums)):
-            distance += abs(self.row_sums[i] - self.goal_row_sums[i])
-
-        #for i in range(len(self.col_sums)):
-        #    distance += 4 * abs(self.col_sums[i] - self.goal_col_sums[i])
+            partial = abs(self.row_sums[i] - self.goal_row_sums[i])
+            if partial == 0:
+                zeros += 1
+            distance += (1 + 5 * zeros) * partial
 
         if self.parent:
             distance += self.parent.get_distance()
@@ -84,7 +85,6 @@ class StateBoard(State):
         return self.children
 
     def rotate_row_right(self, row):
-        #print('rotate row:{row} to the right')
         rotated_row = [0 for _ in range(Board.W)]
         for i in range(Board.W):
             j = 0 if i == Board.W - 1 else i + 1
@@ -99,7 +99,6 @@ class StateBoard(State):
         return StateBoard(value=newvalue, parent=self, start=self.start, goal=self.goal, free_space=new_p)
 
     def rotate_row_left(self, row):
-        #print('rotate row:{row} to the left')
         rotated_row = [0 for _ in range(Board.W)]
         for i in range(Board.W - 1, -1, -1):
             j = Board.W - 1 if i == 0 else i - 1
@@ -134,7 +133,6 @@ class StateBoard(State):
         y = row
         x = col
         new_p = Position(x=x, y=y)
-        #print(f'current:{self.value}, child:{nboard}')
         return StateBoard(value=nboard, parent=self, start=self.start, goal=self.goal, free_space=new_p)
 
     def move_free_space_down(self, steps):
@@ -154,7 +152,6 @@ class StateBoard(State):
         y = row
         x = col
         new_p = Position(x=x, y=y)
-        #print(f'current:{self.value}, child:{nboard}')
         return StateBoard(value=nboard, parent=self, start=self.start, goal=self.goal, free_space=new_p)
 
 def get_state_distance(state):
@@ -180,7 +177,7 @@ class BoardSolver:
 
         while len(self.open_set) > 0:
             current = self.open_set[0]
-            print(f'current: {current}')
+            print(f'current: {current}, {current.distance}')
             self.open_set.remove(current)
             self.closed_set.append(current)
 
