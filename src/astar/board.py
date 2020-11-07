@@ -30,7 +30,7 @@ class StateBoard(State):
         if other == None:
             return False
         #print(f'StateBoard.__eq__(self, other), self.value:{self.value}, other.value:{other.value}')
-        return self.distance == other.value and self.value == other.value
+        return self.value == other.value
 
     def __str__(self):
         return f'BoardState({self.value})'
@@ -51,8 +51,8 @@ class StateBoard(State):
         for i in range(len(self.row_sums)):
             distance += abs(self.row_sums[i] - self.goal_row_sums[i])
 
-        for i in range(len(self.col_sums)):
-            distance += abs(self.col_sums[i] - self.goal_col_sums[i])
+        #for i in range(len(self.col_sums)):
+        #    distance += 4 * abs(self.col_sums[i] - self.goal_col_sums[i])
 
         if self.parent:
             distance += self.parent.get_distance()
@@ -171,50 +171,32 @@ class BoardSolver:
         self.free_space = Position(x = 3, y = 0)
 
     def solve(self):
-        #print(f'BoardSolver.solve()')
+        self.open_set = []
+        self.closed_set = []
+
         start_state = StateBoard(value=self.start, parent=None, start=self.start, goal=self.goal)
-        #print(f'start_state:{start_state}')
-        count = 0
-        self.queue.put((0, count, start_state))
-        while not self.path and self.queue.qsize():
-            _, _, closest_children = self.queue.get()
-            #print(f'closest_children:{closest_children}')
-            closest_children.create_children()
-            for child in closest_children.children:
-                if child.value not in self.open_set:
-                    self.open_set.append(child.value)
+
+        self.open_set.append(start_state)
+
+        while len(self.open_set) > 0:
+            current = self.open_set[0]
+            print(f'current: {current}')
+            self.open_set.remove(current)
+            self.closed_set.append(current)
+
+            if current.value == self.goal:
+                self.path = current.path
+                break
+
+            current.create_children()
+            children = current.children
+
+            for child in children:
+                if child in self.closed_set:
+                    continue
+                if child in self.open_set:
+                    continue
+                self.open_set.append(child)
             self.open_set.sort(key=get_state_distance)
-            #for i, child in enumerate(closest_children.children):
-            #    print(f'child No. {i+1}:{child}')
-            #return
-            closest_children.children.sort(key=get_state_distance)
-            #for i, child in enumerate(closest_children.children):
-            #   print(f'child No. {i+1}:{child}')
-            #return
-            #print(f'child is {closest_children.value}')
-            self.visited_queue.append(closest_children.value)
-            for child in open_set:
-                if child.value not in self.visited_queue:
-                    self.visited_queue.append(child.value)
-                    count += 1
-                    if child.value == self.goal:
-                        #print('child == goal')
-                        self.path = child.path
-                        #print('------------------------------------')
-                        break
-                    if child.distance == 0 and child.value == self.goal:
-                        #print('distance == 0')
-                        #print(f'current path:{self.path}, new path:{child.path}')
-                        self.path = child.path
-                        #print('------------------------------------')
-                        break
-                    self.queue.put((child.distance, count, child))
-            #print('exited the for')
         if not self.path:
-            #print('start')
-            #for row in self.start:
-            #    print(f'{row}')
-            #print('start')
-            #for row in self.goal:
-            #    print(f'{row}')
             print('is not possible?')
