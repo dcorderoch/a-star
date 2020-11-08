@@ -32,6 +32,8 @@ class UI(UIMain.Ui_MainWindow, QMainWindow):
         self.btnRight3.clicked.connect(lambda: self.rightBtnHandler(3))
         self.btnRight4.clicked.connect(lambda: self.rightBtnHandler(4))
 
+        self.btnShuffle.clicked.connect(lambda : self.shuffleBtnHandler())
+
         for y in range(Board.HEIGTH):
             for x in range(Board.WIDTH):
                 self.board_buttons[y][x].clicked.connect(
@@ -57,6 +59,10 @@ class UI(UIMain.Ui_MainWindow, QMainWindow):
                 self.board_buttons[y][x].setStyleSheet(
                     self.token_colors[self.game._board[y][x]])
         pass
+
+    def shuffleBtnHandler(self):
+        self.game.shuffle()
+        self.redrawBoard()
 
 
 if __name__ == '__main__':
