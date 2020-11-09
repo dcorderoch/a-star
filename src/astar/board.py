@@ -80,10 +80,16 @@ class StateBoard(State):
             if p == 0:
                 czeros += 1
 
-        if czeros == Board.W:
-            self.h = 1
-        else:
-            self.h = (Board.H - rzeros) + (Board.W - czeros)
+        matches = 0
+        for i, row in enumerate(self.value):
+            for j, cell in enumerate(row):
+                matches += 1 * (self.value[i][j] == self.goal[i][j])
+
+        rows_diff = (Board.H - rzeros)
+        cols_diff = (Board.W - czeros)
+        pos_diff = (Board.H * Board.W - matches)
+
+        self.h =  rows_diff + cols_diff + pos_diff
 
         self.distance = distance + self.h
         return self.distance
