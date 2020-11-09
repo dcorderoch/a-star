@@ -10,8 +10,8 @@ class Position:
         self.row = y
 
 class Board(IntEnum):
-    WIDTH = 3
-    HEIGHT = 4
+    WIDTH = 4
+    HEIGHT = 5
     W = WIDTH
     H = HEIGHT
 
@@ -32,7 +32,6 @@ class StateBoard(State):
     def __eq__(self, other):
         if other == None:
             return False
-        #print(f'StateBoard.__eq__(self, other), self.value:{self.value}, other.value:{other.value}')
         return self.value == other.value
     def __lt__(self, other):
         return self.get_distance() < other.get_distance()
@@ -116,8 +115,6 @@ class StateBoard(State):
                 tmp = self.move_free_space_up(steps)
                 if tmp != None:
                     if tmp not in closed_set:
-                        print('moved up')
-                        print(tmp)
                         self.children.append(tmp)
                 tmp = self.move_free_space_down(steps)
                 if tmp != None:
@@ -268,7 +265,7 @@ class BoardSolver:
 
             if current.value == self.goal:
                 self.path = current.path
-                break
+                return
 
             current.create_children(self.closed_set)
             children = current.children
@@ -283,7 +280,5 @@ class BoardSolver:
                     continue
                 self.open_set.append(child)
             self.open_set.sort()
-            if(len(self.open_set)) < 10:
-                print(f'openset:{self.open_set}')
         if not self.path:
             print('is not possible?')
