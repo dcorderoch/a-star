@@ -83,7 +83,7 @@ class StateBoard(State):
         if czeros == Board.W:
             self.h = 1
         else:
-            self.h = (Board.H - rzeros) + ((Board.W - czeros ) << 2)
+            self.h = (Board.H - rzeros) + (Board.W - czeros)
 
         self.distance = distance + self.h
         return self.distance
@@ -101,36 +101,33 @@ class StateBoard(State):
             if tmp not in closed_set and tmp not in self.children:
                 self.children.append(tmp)
         for steps in range(Board.W):
+            # insert child made by moving the free space to the left # this is NOT valid in the toy
             tmp = self.move_free_space_left(steps)
             if tmp != None:
                 if tmp not in closed_set and tmp not in self.children:
                     self.children.append(tmp)
+            # insert child made by moving the free space to the right # this is NOT valid in the toy
             tmp = self.move_free_space_right(steps)
             if tmp != None:
                 if tmp not in closed_set and tmp not in self.children:
                     self.children.append(tmp)
 
-        if self.make_vertical:
-            for steps in range(Board.H):
-                tmp = self.move_free_space_up(steps)
-                if tmp != None:
-                    if tmp not in closed_set:
-                        self.children.append(tmp)
-                tmp = self.move_free_space_down(steps)
-                if tmp != None:
-                    if tmp not in closed_set:
-                        self.children.append(tmp)
-        for row in range(Board.H):
-            child = self.rotate_row_left(row)
-            if child != None:
-                if child not in closed_set:
-                    self.children.append(child)
-            for step in range(Board.W):
-                child = child.rotate_row_left(row)
-                if child != None:
-                    if child not in closed_set:
-                        self.children.append(child)
-        return self.children
+        for steps in range(Board.H):
+            if self.free_space.row == 0:
+                break
+            # insert child made by moving the free space up
+            tmp = self.move_free_space_up(steps)
+            if tmp != None:
+                if tmp not in closed_set:
+                    self.children.append(tmp)
+        for steps in range(Board.H):
+            if self.free_space.row == Board.H - 1:
+                break
+            # insert child made by moving the free space down
+            tmp = self.move_free_space_down(steps)
+            if tmp:
+                if tmp not in closed_set:
+                    self.children.append(tmp)
 
     def rotate_row_right(self, row):
         rotated_row = [0 for _ in range(Board.W)]
@@ -157,6 +154,23 @@ class StateBoard(State):
         x = self.free_space.col - 1 * (self.free_space.row == row)
         if x < 0:
             x = Board.W - 1
+        new_p = Position(x=x, y=y)
+        return StateBoard(value=nboard, parent=self, start=self.start, goal=self.goal, free_space=new_p)
+
+    def move_free_space_down(self, steps):
+        row = self.free_space.row
+        col = self.free_space.col
+        if row == Board.H - 1 or row + steps >=Board.H:
+            return None
+        if row + steps >= Board.H:
+            return None
+        nboard = copy.deepcopy(self.value)
+        for i in range(steps):
+            tmp = nboard[row+i+1][col]
+            nboard[row+i+1][col] = nboard[row+i][col]
+            nboard[row+i][col] = tmp
+        y = row + steps
+        x = col
         new_p = Position(x=x, y=y)
         return StateBoard(value=nboard, parent=self, start=self.start, goal=self.goal, free_space=new_p)
 
@@ -211,25 +225,6 @@ class StateBoard(State):
         new_p = Position(x=x, y=y)
         return StateBoard(value=nboard, parent=self, start=self.start, goal=self.goal, free_space=new_p)
 
-    def move_free_space_down(self, steps):
-        row = self.free_space.row
-        col = self.free_space.col
-        if row + 1 == Board.H:
-            return None
-        if row + steps >= Board.H:
-            return None
-        if self.value[row][col] == -1:
-            return None
-        nboard = copy.deepcopy(self.value)
-        for i in range(steps):
-            tmp = nboard[row+i+1][col]
-            nboard[row+i+1][col] = nboard[row+i][col]
-            nboard[row+i][col] = tmp
-        y = row + steps
-        x = col
-        new_p = Position(x=x, y=y)
-        return StateBoard(value=nboard, parent=self, start=self.start, goal=self.goal, free_space=new_p)
-
 def get_state_distance(state):
     return state.get_distance()
 
@@ -259,13 +254,13 @@ class BoardSolver:
 
         while len(self.open_set) > 0:
             current = self.open_set[0]
-            print(f'current: {current}, f:{current.get_distance():05d}, g:{current.g:03d}, h:{current.h:03d}')
+            #print(f'current: {current}, f:{current.get_distance():05d}, g:{current.g:03d}, h:{current.h:03d}')
             self.open_set.remove(current)
             self.closed_set.append(current)
 
             if current.value == self.goal:
                 self.path = current.path
-                return
+                break
 
             current.create_children(self.closed_set)
             children = current.children
@@ -273,7 +268,7 @@ class BoardSolver:
             for child in children:
                 if child.value == self.goal:
                     self.path = child.path
-                    return
+                    return # this here, it's extremely important
                 if child in self.closed_set:
                     continue
                 if child in self.open_set:
