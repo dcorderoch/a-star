@@ -34,6 +34,14 @@ class StateBoard(State):
             return False
         #print(f'StateBoard.__eq__(self, other), self.value:{self.value}, other.value:{other.value}')
         return self.value == other.value
+    def __lt__(self, other):
+        return self.get_distance() < other.get_distance()
+    def __le__(self, other):
+        return self.get_distance() <= other.get_distance()
+    def __gt__(self, other):
+        return self.get_distance() > other.get_distance()
+    def __ge__(self, other):
+        return self.get_distance() >= other.get_distance()
 
     def __str__(self):
         return f'BoardState({self.value})'
@@ -54,74 +62,77 @@ class StateBoard(State):
 
         if self.parent:
             self.g = 1 + self.parent.g
-
         distance += self.g
 
-        incorrect_positions = Board.H * Board.W
-        for i in range(len(self.value)):
-            for j in range(len(self.value[0])):
-                if self.value[i][j] == self.goal[i][j]:
-                    incorrect_positions -= 1
-        self.h = incorrect_positions
-
         partials = [0 for _ in self.row_sums]
-        zeros = 0
-
+        rzeros = 0
         for i, _ in enumerate(self.row_sums):
             p = abs(self.row_sums[i] - self.goal_row_sums[i])
-            partials[i] = p * p
             if p == 0:
-                zeros += 1
+                rzeros += 1
 
-        if zeros == Board.H:
-            self.make_vertical = False
-            self.distance = distance
-            return self.distance
+        #if rzeros == Board.H:
+        #    self.make_vertical = False
 
-        for i, p in enumerate(partials):
-            self.h += ((5 - zeros) << 2) + p ** 2
+        partials = [0 for _ in self.col_sums]
+        czeros = 0
+        for i, _ in enumerate(self.col_sums):
+            p = abs(self.col_sums[i] - self.goal_row_sums[i])
+            if p == 0:
+                czeros += 1
 
-        distance += self.h
+        if czeros == Board.W:
+            self.h = 1
+        else:
+            self.h = (Board.H - rzeros) + ((Board.W - czeros ) << 2)
 
-        self.distance = distance
-        return distance
+        self.distance = distance + self.h
+        return self.distance
 
-    def create_children(self, open_set, closed_set):
+    def create_children(self, closed_set):
         if self.children != []:
             return
         for row in range(Board.H):
-            if row == self.free_space.row:
-                continue # only do for values other than the current state's row
             # insert child made by rotating a row to the right
-            if row != 0:
-                tmp = self.rotate_row_right(row)
-                if tmp not in open_set and tmp not in closed_set and tmp not in self.children:
-                    self.children.append(tmp)
+            tmp = self.rotate_row_right(row)
+            if tmp not in closed_set and tmp not in self.children:
+                self.children.append(tmp)
             # insert child made by rotating a row to the left
-            if row != 0:
-                tmp = self.rotate_row_left(row)
-                if tmp not in open_set and tmp not in closed_set and tmp not in self.children:
-                    self.children.append(tmp)
+            tmp = self.rotate_row_left(row)
+            if tmp not in closed_set and tmp not in self.children:
+                self.children.append(tmp)
         for steps in range(Board.W):
             tmp = self.move_free_space_left(steps)
             if tmp != None:
-                if tmp not in open_set and tmp not in closed_set and tmp not in self.children:
+                if tmp not in closed_set and tmp not in self.children:
                     self.children.append(tmp)
             tmp = self.move_free_space_right(steps)
             if tmp != None:
-                if tmp not in open_set and tmp not in closed_set and tmp not in self.children:
+                if tmp not in closed_set and tmp not in self.children:
                     self.children.append(tmp)
 
         if self.make_vertical:
             for steps in range(Board.H):
                 tmp = self.move_free_space_up(steps)
                 if tmp != None:
-                    if tmp not in open_set and tmp not in closed_set:
+                    if tmp not in closed_set:
+                        print('moved up')
+                        print(tmp)
                         self.children.append(tmp)
                 tmp = self.move_free_space_down(steps)
                 if tmp != None:
-                    if tmp not in open_set and tmp not in closed_set:
+                    if tmp not in closed_set:
                         self.children.append(tmp)
+        for row in range(Board.H):
+            child = self.rotate_row_left(row)
+            if child != None:
+                if child not in closed_set:
+                    self.children.append(child)
+            for step in range(Board.W):
+                child = child.rotate_row_left(row)
+                if child != None:
+                    if child not in closed_set:
+                        self.children.append(child)
         return self.children
 
     def rotate_row_right(self, row):
@@ -223,7 +234,7 @@ class StateBoard(State):
         return StateBoard(value=nboard, parent=self, start=self.start, goal=self.goal, free_space=new_p)
 
 def get_state_distance(state):
-    return state.distance
+    return state.get_distance()
 
 def get_state_g(state):
     return state.g
@@ -251,7 +262,7 @@ class BoardSolver:
 
         while len(self.open_set) > 0:
             current = self.open_set[0]
-            print(f'current: {current}, f:{current.get_distance()}, g:{current.g}, h:{current.h}')
+            print(f'current: {current}, f:{current.get_distance():05d}, g:{current.g:03d}, h:{current.h:03d}')
             self.open_set.remove(current)
             self.closed_set.append(current)
 
@@ -259,18 +270,20 @@ class BoardSolver:
                 self.path = current.path
                 break
 
-            current.create_children(self.open_set, self.closed_set)
+            current.create_children(self.closed_set)
             children = current.children
 
             for child in children:
                 if child.value == self.goal:
                     self.path = child.path
-                    break
+                    return
                 if child in self.closed_set:
                     continue
                 if child in self.open_set:
                     continue
                 self.open_set.append(child)
-            self.open_set.sort(key=get_state_distance)
+            self.open_set.sort()
+            if(len(self.open_set)) < 10:
+                print(f'openset:{self.open_set}')
         if not self.path:
             print('is not possible?')
