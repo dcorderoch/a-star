@@ -2,7 +2,7 @@ from enum import IntEnum
 from state import State
 import copy
 
-from queue import PriorityQueue as queue
+from queue import PriorityQueue
 
 class Position:
     def __init__(self, *, x, y):
@@ -54,6 +54,20 @@ class StateBoard(State):
                 cols[y] += board[x][y]
         return rows, cols
 
+    def find_nearest(self, yi, xi):
+        points = {}
+        dist = 0
+        look_for = self.value[yi][xi]
+        for y, row in enumerate(self.goal):
+            for x, cell in enumerate(row):
+                if cell == look_for:
+                    dist =  (abs(y - yi) << 2) + abs(x - xi)
+                    points[(y,x)] = dist
+        for p in points:
+            if p[1] < dist:
+                dist = p[1]
+        return dist
+
     def get_distance(self):
         if self.distance != 0:
             return self.distance # it has already been calculated
@@ -65,24 +79,24 @@ class StateBoard(State):
 
         partials = [0 for _ in self.row_sums]
         rows_diff = Board.H
-        for i, _ in enumerate(self.row_sums):
-            p = abs(self.row_sums[i] - self.goal_row_sums[i])
-            if p == 0:
+        for i, rs in enumerate(self.row_sums):
+            diff = abs(rs - self.goal_row_sums[i])
+            if diff == 0:
                 rows_diff -= 1
 
         partials = [0 for _ in self.col_sums]
         cols_diff = Board.W
-        for i, _ in enumerate(self.col_sums):
-            p = abs(self.col_sums[i] - self.goal_col_sums[i])
-            if p == 0:
+        for i, cs in enumerate(self.col_sums):
+            diff = abs(cs - self.goal_col_sums[i])
+            if diff == 0:
                 cols_diff -= 1
 
         pos_diff = Board.H * Board.W
         for i, row in enumerate(self.value):
             for j, cell in enumerate(row):
-                pos_diff -= 1 * (self.value[i][j] == self.goal[i][j])
+                pos_diff -= 1 * (cell == self.goal[i][j])
 
-        self.h =  rows_diff + cols_diff + pos_diff
+        self.h = rows_diff + cols_diff + pos_diff
 
         self.distance = distance + self.h
         return self.distance
@@ -236,25 +250,21 @@ def get_state_h(state):
 class BoardSolver:
     def __init__(self, *, start, goal, x, y):
         self.path = []
-        self.open_set = []
-        self.visited_queue = []
-        self.queue = queue()
         self.start = start
         self.goal = goal
         self.free_space = Position(x = x, y = y)
 
     def solve(self):
-        self.open_set = []
+        self.open_set = PriorityQueue()
         self.closed_set = []
 
         start_state = StateBoard(value=self.start, parent=None, free_space=self.free_space, start=self.start, goal=self.goal)
 
-        self.open_set.append(start_state)
+        self.open_set.put((start_state.get_distance(), start_state.g, start_state))
 
-        while len(self.open_set) > 0:
-            current = self.open_set[0]
-            #print(f'current: {current}, f:{current.get_distance():05d}, g:{current.g:03d}, h:{current.h:03d}')
-            self.open_set.remove(current)
+        while not self.open_set.empty():
+            current = self.open_set.get()[2]
+            print(f'current: {current}, f:{current.get_distance():05d}, g:{current.g:03d}, h:{current.h:03d}')
             self.closed_set.append(current)
 
             if current.value == self.goal:
@@ -270,9 +280,6 @@ class BoardSolver:
                     return # this here, it's extremely important
                 if child in self.closed_set:
                     continue
-                if child in self.open_set:
-                    continue
-                self.open_set.append(child)
-            self.open_set.sort()
+                self.open_set.put((child.get_distance(), child.g, child))
         if not self.path:
             print('is not possible?')
