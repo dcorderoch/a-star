@@ -7,8 +7,6 @@ def main():
 
     # works
     start = [[-1, -1, -1, 0], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]]
-    x = 3
-    y = 0
 
     # works (no change)
     #goal = [[-1, -1, -1, 0], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]]
@@ -54,6 +52,14 @@ def main():
 
     print(f'new start: {start}')
     print(f'new goal: {goal}')
+    for i, row in enumerate(start):
+        for j, cell in enumerate(row):
+            if cell == 0:
+                y,x = i,j
+                break
+        else:
+            continue
+        break
     b = BoardSolver(start=start, goal=goal, x=x, y=y) # x = start's free space's col, same for y
     b.solve()
     print('the path is')
