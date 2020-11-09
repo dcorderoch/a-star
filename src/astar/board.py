@@ -64,30 +64,23 @@ class StateBoard(State):
         distance += self.g
 
         partials = [0 for _ in self.row_sums]
-        rzeros = 0
+        rows_diff = Board.H
         for i, _ in enumerate(self.row_sums):
             p = abs(self.row_sums[i] - self.goal_row_sums[i])
             if p == 0:
-                rzeros += 1
-
-        #if rzeros == Board.H:
-        #    self.make_vertical = False
+                rows_diff -= 1
 
         partials = [0 for _ in self.col_sums]
-        czeros = 0
+        cols_diff = Board.W
         for i, _ in enumerate(self.col_sums):
-            p = abs(self.col_sums[i] - self.goal_row_sums[i])
+            p = abs(self.col_sums[i] - self.goal_col_sums[i])
             if p == 0:
-                czeros += 1
+                cols_diff -= 1
 
-        matches = 0
+        pos_diff = Board.H * Board.W
         for i, row in enumerate(self.value):
             for j, cell in enumerate(row):
-                matches += 1 * (self.value[i][j] == self.goal[i][j])
-
-        rows_diff = (Board.H - rzeros)
-        cols_diff = (Board.W - czeros)
-        pos_diff = (Board.H * Board.W - matches)
+                pos_diff -= 1 * (self.value[i][j] == self.goal[i][j])
 
         self.h =  rows_diff + cols_diff + pos_diff
 
