@@ -322,6 +322,7 @@ class BoardSolver:
                     self.path = child.path
                     return  # this here, it's extremely important
                 if child in self.closed_set:
+                    print("child in closed set")
                     continue
                 self.open_set.put((child.get_distance(), child.g, child))
         if not self.path:
