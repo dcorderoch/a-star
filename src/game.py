@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+
+import random as ran
 class Board():
     NOT_USED = -1
     FREE_SPACE = 0
@@ -43,6 +45,22 @@ class Game():
 
     # se encarga de revolver el tablero de juego
     def shuffle(self):
+        initialRow=self._board[0]
+        boardtemp= self._board
+        boardtemp.pop(0)
+        ran.shuffle(boardtemp)
+        for sublist in boardtemp:
+            ran.shuffle(sublist)
+
+        boardtemp.insert(0,initialRow)
+        self._board=boardtemp
+
+        for i in range(Board.HEIGTH):
+            for j in range(Board.WIDTH):
+                if self._board[i][j]==0:
+                    self._free_space=Position(j,i)
+        print(self._free_space.row)
+        print(self._free_space.col)
         return
 
     # se encarga de ejecutar A* para buscar la solución partiendo de _board y llegando a _final_board.
