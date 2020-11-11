@@ -7,7 +7,6 @@ from heapq import heappush, heappop, heapify
 
 Infinite = float('inf')
 
-
 class AStar:
     __metaclass__ = ABCMeta
     __slots__ = ()
@@ -41,11 +40,6 @@ class AStar:
         # colors = {red:False,blue:False,yellow:False,}
         for y, row in enumerate(goal):
             for x, col_v in enumerate(row):
-                if col_v == -1 or col_v == 0:
-                    continue
-                # if averages[int(col_v) - 1]:
-                #     continue
-
                 curr_average = 999
                 color_match_count = 0
                 # check current matrix for distances
@@ -254,7 +248,6 @@ class AStar:
             count += 1
             print(count)
         return None
-
 
 if __name__ == "__main__":
     goal = [[-1, -1, -1, 4], [3, 0, 1, 2],
