@@ -24,10 +24,10 @@ class StateBoard(State):
         self.free_space = free_space
         self.g = 0
         self.h = 0
-        # self.goal_row_sums, self.goal_col_sums = self.calculate_board_sums(
-        #     board=self.goal)
-        # self.row_sums, self.col_sums = self.calculate_board_sums(
-        #     board=self.value)
+        self.goal_row_sums, self.goal_col_sums = self.calculate_board_sums(
+            board=self.goal)
+        self.row_sums, self.col_sums = self.calculate_board_sums(
+            board=self.value)
         self.make_vertical = True
         self.get_distance()
 
@@ -37,6 +37,7 @@ class StateBoard(State):
     def __eq__(self, other):
         if other == None:
             return False
+
         return self.value == other.value
 
     def __lt__(self, other):
@@ -83,20 +84,24 @@ class StateBoard(State):
         h = 0
         for y, row in enumerate(self.goal):
             for x, col_v in enumerate(row):
-                if col_v == -1 or col_v == 0:
+                if col_v == -1 or col_v == 0 or averages[col_v - 1]:
                     continue
                 curr_average = 0
                 # check current matrix for distances
                 for c_y, c_row in enumerate(self.value):
                     for c_x, c_col_v in enumerate(c_row):
                         if c_col_v == col_v:
-                            curr_average += abs(c_y-y)+abs(c_x-x)
+                            # curr_average += abs(c_y-y)+abs(c_x-x)
+                            temp_average = abs(c_y-y)+abs(c_x-x)
+                            if temp_average < curr_average:
+                                curr_average = temp_average
                 # curr_average = curr_average >> 2 # divide by 4
                 # we do col_v-1 because color values start at 1
-                averages[col_v-1] += curr_average
+                averages[col_v-1] += curr_average >> 2
+                h += (curr_average / 4)
 
-        for i in range(4):
-            h += averages[i] >> 2
+        # for i in range(4):
+        #     h += averages[i]
 
         return h
 
@@ -295,6 +300,7 @@ class BoardSolver:
         self.free_space = Position(x=x, y=y)
 
     def solve(self):
+        count = 0
         self.open_set = PriorityQueue()
         self.closed_set = []
 
@@ -307,7 +313,7 @@ class BoardSolver:
         while not self.open_set.empty():
             current = self.open_set.get()[2]
             print(
-                f'current: {current}, f:{current.get_distance():05d}, g:{current.g:03d}, h:{current.h:03d}')
+                f'current: {current}, f:{current.get_distance():05f}, g:{current.g:03d}, h:{current.h:03f}')
             self.closed_set.append(current)
 
             if current.value == self.goal:
@@ -321,9 +327,14 @@ class BoardSolver:
                 if child.value == self.goal:
                     self.path = child.path
                     return  # this here, it's extremely important
-                if child in self.closed_set:
-                    print("child in closed set")
-                    continue
+                # if child in self.closed_set:
+                #     # print("child in closed set")
+                #     continue
                 self.open_set.put((child.get_distance(), child.g, child))
+            count += 1
+            print(count)
+            # print("closed set:", len(self.closed_set))
+
         if not self.path:
             print('is not possible?')
+        print(count)
