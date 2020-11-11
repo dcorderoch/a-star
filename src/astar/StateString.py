@@ -3,12 +3,12 @@ from state import State
 class StateString(State):
     def __init__(self, value, parent, start = 0, goal = 0):
         super(StateString, self).__init__(value, parent, start, goal)
-        self.distance = self.get_distance()
+        self.distance = self.get_f()
     def __repr__(self):
         return f'StringState({self.value})'
     def __str__(self):
         return f'StringState({self.value})'
-    def get_distance(self):
+    def get_f(self):
         if self.value == self.goal:
             return 0
         distance = 0

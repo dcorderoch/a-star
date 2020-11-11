@@ -4,19 +4,16 @@ import copy
 
 from queue import PriorityQueue
 
-
 class Position:
     def __init__(self, *, x, y):
         self.col = x
         self.row = y
-
 
 class Board(IntEnum):
     WIDTH = 4
     HEIGHT = 5
     W = WIDTH
     H = HEIGHT
-
 
 class StateBoard(State):
     def __init__(self, *, value, parent, free_space, start=0, goal=0):
@@ -29,7 +26,7 @@ class StateBoard(State):
         self.row_sums, self.col_sums = self.calculate_board_sums(
             board=self.value)
         self.make_vertical = True
-        self.get_distance()
+        self.get_f()
 
     def __repr__(self):
         return f'BoardState({self.value})'
@@ -41,16 +38,16 @@ class StateBoard(State):
         return self.value == other.value
 
     def __lt__(self, other):
-        return self.get_distance() < other.get_distance()
+        return self.get_f() < other.get_f()
 
     def __le__(self, other):
-        return self.get_distance() <= other.get_distance()
+        return self.get_f() <= other.get_f()
 
     def __gt__(self, other):
-        return self.get_distance() > other.get_distance()
+        return self.get_f() > other.get_f()
 
     def __ge__(self, other):
-        return self.get_distance() >= other.get_distance()
+        return self.get_f() >= other.get_f()
 
     def __str__(self):
         return f'BoardState({self.value})'
@@ -84,8 +81,6 @@ class StateBoard(State):
         h = 0
         for y, row in enumerate(self.goal):
             for x, col_v in enumerate(row):
-                if col_v == -1 or col_v == 0 or averages[col_v - 1]:
-                    continue
                 curr_average = 0
                 # check current matrix for distances
                 for c_y, c_row in enumerate(self.value):
@@ -98,48 +93,51 @@ class StateBoard(State):
                 # curr_average = curr_average >> 2 # divide by 4
                 # we do col_v-1 because color values start at 1
                 averages[col_v-1] += curr_average >> 2
-                h += (curr_average / 4)
+                h += (curr_average // 4)
 
         # for i in range(4):
         #     h += averages[i]
 
         return h
+    def get_h(self):
+        if self.h != 0:
+            return self.h # already calculated
+        partials = [0 for _ in self.row_sums]
+        rows_diff = Board.H
+        for i, rs in enumerate(self.row_sums):
+            diff = abs(rs - self.goal_row_sums[i])
+            if diff == 0:
+                rows_diff -= 1
 
-    def get_distance(self):
-        if self.distance != 0:
-            return self.distance  # it has already been calculated
-        distance = 0
+        partials = [0 for _ in self.col_sums]
+        cols_diff = Board.W
+        for i, cs in enumerate(self.col_sums):
+            diff = abs(cs - self.goal_col_sums[i])
+            if diff == 0:
+                cols_diff -= 1
 
+        pos_diff = Board.H * Board.W
+        for i, row in enumerate(self.value):
+            for j, cell in enumerate(row):
+                pos_diff -= 1 * (cell == self.goal[i][j])
+
+        self.h = rows_diff + cols_diff + pos_diff
+
+        return self.h
+
+    def get_g(self):
+        if self.g != 0:
+            return self.g
         if self.parent:
             self.g = 1 + self.parent.g
-        distance += self.g
+        return self.g
 
-# -------------------- starts h calculation -------------------
-        # partials = [0 for _ in self.row_sums]
-        # rows_diff = Board.H
-        # for i, rs in enumerate(self.row_sums):
-        #     diff = abs(rs - self.goal_row_sums[i])
-        #     if diff == 0:
-        #         rows_diff -= 1
+    def get_f(self):
+        if self.distance != 0:
+            return self.distance  # it has already been calculated
 
-        # partials = [0 for _ in self.col_sums]
-        # cols_diff = Board.W
-        # for i, cs in enumerate(self.col_sums):
-        #     diff = abs(cs - self.goal_col_sums[i])
-        #     if diff == 0:
-        #         cols_diff -= 1
+        self.distance = self.get_g() + self.get_h()
 
-        # pos_diff = Board.H * Board.W
-        # for i, row in enumerate(self.value):
-        #     for j, cell in enumerate(row):
-        #         pos_diff -= 1 * (cell == self.goal[i][j])
-
-        # self.h = rows_diff + cols_diff + pos_diff
-
-# ------------------------------------------------
-        self.h = self.calc_h()
-
-        self.distance = distance + self.h
         return self.distance
 
     def create_children(self, closed_set):
@@ -279,18 +277,14 @@ class StateBoard(State):
         new_p = Position(x=x, y=y)
         return StateBoard(value=nboard, parent=self, start=self.start, goal=self.goal, free_space=new_p)
 
-
 def get_state_distance(state):
-    return state.get_distance()
-
+    return state.get_f()
 
 def get_state_g(state):
     return state.g
 
-
 def get_state_h(state):
     return state.h
-
 
 class BoardSolver:
     def __init__(self, *, start, goal, x, y):
@@ -300,41 +294,34 @@ class BoardSolver:
         self.free_space = Position(x=x, y=y)
 
     def solve(self):
-        count = 0
         self.open_set = PriorityQueue()
-        self.closed_set = []
+        self.closed_set = ()
 
         start_state = StateBoard(value=self.start, parent=None,
                                  free_space=self.free_space, start=self.start, goal=self.goal)
 
-        self.open_set.put((start_state.get_distance(),
-                           start_state.g, start_state))
+        self.open_set.put((start_state.get_f(), start_state.g, start_state))
 
+        i = 0
         while not self.open_set.empty():
-            current = self.open_set.get()[2]
-            print(
-                f'current: {current}, f:{current.get_distance():05f}, g:{current.g:03d}, h:{current.h:03f}')
-            self.closed_set.append(current)
+            curr = self.open_set.get()[2]
+            if i % 0x80 == 0:
+                print(f'curr: {curr}, f:{curr.get_f():04d}, g:{curr.g:03d}, h:{curr.h:03d}')
+            self.closed_set = (*self.closed_set, curr)
 
-            if current.value == self.goal:
-                self.path = current.path
+            if curr.value == self.goal:
+                self.path = curr.path
                 break
 
-            current.create_children(self.closed_set)
-            children = current.children
+            curr.create_children(self.closed_set)
+            children = curr.children
 
             for child in children:
                 if child.value == self.goal:
                     self.path = child.path
                     return  # this here, it's extremely important
-                # if child in self.closed_set:
-                #     # print("child in closed set")
-                #     continue
-                self.open_set.put((child.get_distance(), child.g, child))
-            count += 1
-            print(count)
-            # print("closed set:", len(self.closed_set))
+                self.open_set.put((child.get_f(), child.g, child))
+                i += 1
 
         if not self.path:
             print('is not possible?')
-        print(count)

@@ -29,7 +29,7 @@ class State(object):
     def __str__(self):
         pass
 
-    def get_distance(self):
+    def get_f(self):
         pass
 
     def create_children(self):
