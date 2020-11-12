@@ -2,6 +2,8 @@ from enum import Enum
 import json
 from PySide2.QtWidgets import QFileDialog
 from PySide2.QtWidgets import *
+from astar import *
+import copy
 
 
 # coding=utf-8
@@ -36,7 +38,7 @@ class Game():
         # el primer row del tablero solo puede contener una pieza, por lo que efectivamente el tablero empieza en el 2ndo row
         self.reset_board()
 
-        self._final_board = self._board
+        self._final_board = copy.deepcopy(self._board)
         self._free_space = Position(3, 0)
 
     RED = "0"
@@ -153,10 +155,6 @@ class Game():
         elif str(colorCode) == self.YELLOW:
             board[row+1][column] = Board.TOKEN4
 
-    # se encarga de guardar la configuración en un archivo de .txt
-    def saveConfig(self):
-        return
-
     # se encarga de revolver el tablero de juego
     def shuffle(self):
         initialRow = self._board[0]
@@ -180,6 +178,10 @@ class Game():
     # se encarga de ejecutar A* para buscar la solución partiendo de _board y llegando a _final_board.
     # Debe guarda los pasos de solución de algún modo que pueda ser luego ejecutado
     def solvePuzzle(self):
+        print(self._board)
+        solver = AStar(self._board, self._final_board)
+        solution = solver.solve()
+        print(solution.get_board())
         return
 
     def rotateRowRight(self, row):

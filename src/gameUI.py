@@ -45,6 +45,8 @@ class UI(UIMain.Ui_MainWindow, QMainWindow):
                                                 self.btnLoadFileHandler("goal"))
         self.btnSaveFile.clicked.connect(self.btnSaveFileHandler)
 
+        self.btnResolve.clicked.connect(self.solve)
+
     def leftBtnHandler(self, row):
         self.game.rotateRowLeft(row)
         self.redrawBoard()
@@ -58,6 +60,9 @@ class UI(UIMain.Ui_MainWindow, QMainWindow):
         self.game.moveFreeSpace(row, col)
         self.redrawBoard()
     # sets the right color on the respective button
+
+    def solve(self):
+        self.game.solvePuzzle()
 
     def redrawBoard(self):
         for y in range(Board.HEIGTH):
