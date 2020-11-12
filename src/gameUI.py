@@ -1,9 +1,13 @@
+import threading
+import time
+
 from PySide2.QtCore import *
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 from Astar import *
 from UI import UIMain
 from UI.UIMain import Colors
+
 
 from game import *
 
@@ -21,6 +25,7 @@ class UI(UIMain.Ui_MainWindow, QMainWindow):
         self.curr_step = 0
         self.last_step = 0
         self.solution = []
+        self.playing_solution = False
 
     def setButtonHandlers(self):
         self.btnLeft0.clicked.connect(lambda: self.leftBtnHandler(0))
@@ -41,7 +46,7 @@ class UI(UIMain.Ui_MainWindow, QMainWindow):
         self.btnPreviousStep.clicked.connect(self.stepBackSolution)
         self.btnFirstStep.clicked.connect(self.restartSteps)
 
-        self.btnPlaySolution.clicked.connect(self.playSolution)
+        self.btnPlaySolution.clicked.connect(self.playSolutionBtnHandler)
 
         for y in range(Board.HEIGTH):
             for x in range(Board.WIDTH):
@@ -103,8 +108,26 @@ class UI(UIMain.Ui_MainWindow, QMainWindow):
             self.redrawBoard()
         pass
 
-    def playSolution(self):
+    def playSolutionBtnHandler(self):
+        if not self.playing_solution:
+            self.playing_solution = True
+            # thread.start_new_thread(self.playSolution)
+            t = threading.Thread(target=self.playSolution)
+            t.start()
+            self.btnPlaySolution.setText(QCoreApplication.translate(
+                "MainWindow", u"Pause", None))
+        else:
+            self.playing_solution = False
+            self.btnPlaySolution.setText(QCoreApplication.translate(
+                "MainWindow", u"Play", None))
+
         pass
+
+    def playSolution(self):
+        while self.curr_step < self.last_step-1 and self.playing_solution:
+            self.stepAheadSolution()
+            time.sleep(1.5)
+        self.playing_solution = False
 
     def redrawBoard(self):
 
@@ -126,6 +149,8 @@ class UI(UIMain.Ui_MainWindow, QMainWindow):
             for x in range(Board.WIDTH):
                 self.board_buttons[y][x].setStyleSheet(
                     self.token_colors[self.game._board[y][x]])
+
+        self.show()
         pass
 
     def shuffleBtnHandler(self):
