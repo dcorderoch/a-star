@@ -102,14 +102,34 @@ class StateBoard(State):
     def get_h(self):
         if self.h != 0:
             return self.h # already calculated
-        partials = [0 for _ in self.row_sums]
+
+        values = {-1: (), 0: (), 1: (), 2: (), 3: (), 4: ()}
+        goalvs = {-1: (), 0: (), 1: (), 2: (), 3: (), 4: ()}
+
+        for y in range(Board.H):
+            for x in range(Board.W):
+                value = self.value[y][x]
+                goal = self.goal[y][x]
+                point = (y,x)
+                values[value] = (*values[value], point)
+                goalvs[goal] = (*goalvs[goal], point)
+        manhattan = 0
+        for key in values:
+            vlist = values[key]
+            glist = goalvs[key]
+            tmp = 0
+            for i in range(len(vlist)):
+                for j in range(len(vlist)):
+                    tmp += abs(vlist[j][0] - glist[i][0])
+                    tmp += abs(vlist[j][1] - glist[i][1])
+            manhattan += tmp >> 2
+
         rows_diff = Board.H
         for i, rs in enumerate(self.row_sums):
             diff = abs(rs - self.goal_row_sums[i])
             if diff == 0:
                 rows_diff -= 1
 
-        partials = [0 for _ in self.col_sums]
         cols_diff = Board.W
         for i, cs in enumerate(self.col_sums):
             diff = abs(cs - self.goal_col_sums[i])
@@ -121,7 +141,7 @@ class StateBoard(State):
             for j, cell in enumerate(row):
                 pos_diff -= 1 * (cell == self.goal[i][j])
 
-        self.h = rows_diff + cols_diff + pos_diff
+        self.h = manhattan + rows_diff + cols_diff + pos_diff
 
         return self.h
 
@@ -141,28 +161,28 @@ class StateBoard(State):
         return self.distance
 
     def create_children(self, closed_set):
-        if self.children != []:
-            return
         for row in range(Board.H):
             # insert child made by rotating a row to the right
             tmp = self.rotate_row_right(row)
             if tmp not in closed_set and tmp not in self.children:
-                self.children.append(tmp)
+                self.children = (*self.children, tmp)
+                #self.children.append(tmp)
             # insert child made by rotating a row to the left
             tmp = self.rotate_row_left(row)
             if tmp not in closed_set and tmp not in self.children:
-                self.children.append(tmp)
-        for steps in range(Board.W):
-            # insert child made by moving the free space to the left # this is NOT valid in the toy
-            tmp = self.move_free_space_left(steps)
-            if tmp != None:
-                if tmp not in closed_set and tmp not in self.children:
-                    self.children.append(tmp)
-            # insert child made by moving the free space to the right # this is NOT valid in the toy
-            tmp = self.move_free_space_right(steps)
-            if tmp != None:
-                if tmp not in closed_set and tmp not in self.children:
-                    self.children.append(tmp)
+                #self.children.append(tmp)
+                self.children = (*self.children, tmp)
+        #for steps in range(Board.W):
+        #    # insert child made by moving the free space to the left # this is NOT valid in the toy
+        #    tmp = self.move_free_space_left(steps)
+        #    if tmp != None:
+        #        if tmp not in closed_set and tmp not in self.children:
+        #            self.children.append(tmp)
+        #    # insert child made by moving the free space to the right # this is NOT valid in the toy
+        #    tmp = self.move_free_space_right(steps)
+        #    if tmp != None:
+        #        if tmp not in closed_set and tmp not in self.children:
+        #            self.children.append(tmp)
 
         for steps in range(Board.H):
             if self.free_space.row == 0:
@@ -171,7 +191,8 @@ class StateBoard(State):
             tmp = self.move_free_space_up(steps)
             if tmp != None:
                 if tmp not in closed_set:
-                    self.children.append(tmp)
+                    #self.children.append(tmp)
+                    self.children = (*self.children, tmp)
         for steps in range(Board.H):
             if self.free_space.row == Board.H - 1:
                 break
@@ -179,7 +200,8 @@ class StateBoard(State):
             tmp = self.move_free_space_down(steps)
             if tmp:
                 if tmp not in closed_set:
-                    self.children.append(tmp)
+                    #self.children.append(tmp)
+                    self.children = (*self.children, tmp)
 
     def rotate_row_right(self, row):
         rotated_row = [0 for _ in range(Board.W)]
