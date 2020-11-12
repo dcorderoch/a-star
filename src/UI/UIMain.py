@@ -10,6 +10,7 @@ from PySide2.QtCore import *
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 
+
 class Colors():
     red = "background-color: rgb(255, 103, 103);"
     green = "background-color: rgb(0, 170, 127);"
@@ -17,6 +18,7 @@ class Colors():
     yellow = "background-color: rgb(255, 255, 127);"
     free_space = "background-color: rgb(255, 255, 255);"
     unused_space = ""
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -163,6 +165,7 @@ class Ui_MainWindow(object):
         self.btnPlaySolution = QPushButton(self.centralwidget)
         self.btnPlaySolution.setObjectName(u"btnPlaySolution")
         self.btnPlaySolution.setGeometry(QRect(590, 790, 111, 31))
+        self.btnPlaySolution.setEnabled(False)
 
         self.btnSaveConfiguration = QPushButton(self.centralwidget)
         self.btnSaveConfiguration.setObjectName(u"btnSaveConfiguration")
@@ -182,7 +185,6 @@ class Ui_MainWindow(object):
         self.btnFirstStep.setObjectName(u"btnFirstStep")
         self.btnFirstStep.setGeometry(QRect(590, 860, 111, 31))
         self.btnFirstStep.setEnabled(False)
-
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
@@ -316,4 +318,4 @@ class Ui_MainWindow(object):
             "2) Rotar Izquierda: Desplazar a la Izquierda un espacio cada pieza en una fila\n"
             "3) Desplazamiento Vertical: Desplazar el espacio en blanco de manera vertical 1,2,3 o 4 espacios (Columnas)")
         msg.setWindowTitle("Instrucciones de Juego")
-        ret= msg.exec_()
+        ret = msg.exec_()

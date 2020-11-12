@@ -154,8 +154,9 @@ class AStar:
                 break
 
         if ws_pos[0] != 0:
-            mu = self.move_ws_up(node, ws_pos)
-            res.append(mu)
+            if node[ws_pos[0]][ws_pos[1]] != -1:
+                mu = self.move_ws_up(node, ws_pos)
+                res.append(mu)
         if ws_pos[0] != 4:
             md = self.move_ws_down(node, ws_pos)
             res.append(md)
@@ -193,16 +194,23 @@ class AStar:
         return current == goal
 
     def reconstruct_path(self, last, reversePath=False):
-        def _gen():
-            current = last
-            while current:
-                yield current.data
-                current = current.came_from
+        # def _gen():
+        #     current = last
+        #     while current:
+        #         yield current.data
+        #         current = current.came_from
 
-        if reversePath:
-            return _gen()
-        else:
-            return reversed(list(_gen()))
+        # if reversePath:
+        #     return _gen()
+        # else:
+        #     return reversed(list(_gen()))
+        res = []
+        res.append(last.data)
+        current = last.came_from
+        while current != None:
+            res.append(current.data)
+            current = current.came_from
+        return list(reversed(res))
 
     def astar(self, start, goal, reversePath=False):
         if self.is_goal_reached(start, goal):
@@ -256,7 +264,6 @@ if __name__ == "__main__":
     s_tuple = tuple(tuple(i) for i in start)
     path = (AStar().astar(s_tuple, t_goal,
                           False))
-
     for step in path:
         for what in step:
             print(list(what))

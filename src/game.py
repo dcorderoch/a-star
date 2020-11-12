@@ -3,6 +3,8 @@
 
 
 import random as ran
+
+
 class Board():
     NOT_USED = -1
     FREE_SPACE = 0
@@ -13,15 +15,18 @@ class Board():
     WIDTH = 4
     HEIGTH = 5
 
+
 class BoardMoves():
     RIGHT = 1
     LEFT = 0
     MV_WHTSPC = 2
 
+
 class Position():
     def __init__(self, x, y):
         self.col = x
         self.row = y
+
 
 class Game():
     def __init__(self):
@@ -32,7 +37,14 @@ class Game():
                        [Board.TOKEN1, Board.TOKEN2, Board.TOKEN3, Board.TOKEN4],
                        [Board.TOKEN1, Board.TOKEN2, Board.TOKEN3, Board.TOKEN4]]
 
-        self._final_board = self._board
+        self._final_board = [[Board.NOT_USED, Board.NOT_USED, Board.NOT_USED, Board.FREE_SPACE],
+                             [Board.TOKEN1, Board.TOKEN2,
+                                 Board.TOKEN3, Board.TOKEN4],
+                             [Board.TOKEN1, Board.TOKEN2,
+                                 Board.TOKEN3, Board.TOKEN4],
+                             [Board.TOKEN1, Board.TOKEN2,
+                                 Board.TOKEN3, Board.TOKEN4],
+                             [Board.TOKEN1, Board.TOKEN2, Board.TOKEN3, Board.TOKEN4]]
         self._free_space = Position(3, 0)
 
     # se encarga de cargar la configuracion de un archivo .txt, carga configuracion final e inicial (crear otra si es necesario)
@@ -45,20 +57,20 @@ class Game():
 
     # se encarga de revolver el tablero de juego
     def shuffle(self):
-        initialRow=self._board[0]
-        boardtemp= self._board
+        initialRow = self._board[0]
+        boardtemp = self._board
         boardtemp.pop(0)
         ran.shuffle(boardtemp)
         for sublist in boardtemp:
             ran.shuffle(sublist)
 
-        boardtemp.insert(0,initialRow)
-        self._board=boardtemp
+        boardtemp.insert(0, initialRow)
+        self._board = boardtemp
 
         for i in range(Board.HEIGTH):
             for j in range(Board.WIDTH):
-                if self._board[i][j]==0:
-                    self._free_space=Position(j,i)
+                if self._board[i][j] == 0:
+                    self._free_space = Position(j, i)
         print(self._free_space.row)
         print(self._free_space.col)
         return
@@ -185,7 +197,8 @@ class Game():
             return
         self._board[self._free_space.row][self._free_space.col] = self._board[self._free_space.row +
                                                                               1][self._free_space.col]
-        self._board[self._free_space.row + 1][self._free_space.col] = Board.FREE_SPACE
+        self._board[self._free_space.row +
+                    1][self._free_space.col] = Board.FREE_SPACE
         self._free_space.row += 1
 
     def moveFreeSpaceUP(self):
@@ -198,12 +211,14 @@ class Game():
             return
         self._board[self._free_space.row][self._free_space.col] = self._board[self._free_space.row -
                                                                               1][self._free_space.col]
-        self._board[self._free_space.row - 1][self._free_space.col] = Board.FREE_SPACE
+        self._board[self._free_space.row -
+                    1][self._free_space.col] = Board.FREE_SPACE
         self._free_space.row -= 1
 
         # Se ejecutan los movimientos de la solución uno a uno (PROBABLEMENTE VA EN LA CLASE DE UI!!!)
     def playSolution(self):
         return
+
 
 if __name__ == '__main__':
     game = Game()
