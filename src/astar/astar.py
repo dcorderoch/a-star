@@ -1,9 +1,15 @@
-from StringSolver import StringSolver
+"""
+this is an implementation of the A-star algorithm
+"""
+
 from board import BoardSolver
 
 def main():
+    """
+    this is the main function called when running this script
+    """
     # very simple case
-    print('print Board A*')
+    print('print Board A star')
 
     start = [[-1, -1, -1, 0], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]]
 
@@ -65,20 +71,22 @@ def main():
 
     print(f'new start: {start}')
     print(f'new goal: {goal}')
+
+    initial_y, initial_x = 0, 0
     for i, row in enumerate(start):
         for j, cell in enumerate(row):
             if cell == 0:
-                y, x = i, j
+                initial_y, initial_x = i, j
                 break
         else:
             continue
         break
-    # x = start's free space's col, same for y
-    b = BoardSolver(start=start, goal=goal, x=x, y=y)
-    b.solve()
+    # x = start's free space's col, same for initial_y
+    board_solver = BoardSolver(start=start, goal=goal, x=initial_x, y=initial_y)
+    board_solver.solve()
     print('the path is')
-    for i, s in enumerate(b.path):
-        for row in s:
+    for i, state in enumerate(board_solver.path):
+        for row in state:
             print(f'step:{i}) {row}')
 
 if __name__ == "__main__":

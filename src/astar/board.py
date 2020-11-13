@@ -1,21 +1,36 @@
-from enum import IntEnum
-from state import State
-import copy
+"""
+this is an implementation of the A-star algorithm's state for a board of the whip-it game
+"""
 
+import copy
 from queue import PriorityQueue
+from enum import IntEnum
+from collections import namedtuple
+
+from state import State
 
 class Position:
     def __init__(self, *, x, y):
         self.col = x
         self.row = y
 
+Positiont = namedtuple('Position', ['y', 'x'])
+
+Distancet = namedtuple('Distance', ['g', 'h'])
+
 class Board(IntEnum):
+    """
+    this class is used for Enums, which are constants used in this program
+    """
     WIDTH = 4
     HEIGHT = 5
     W = WIDTH
     H = HEIGHT
 
 class StateBoard(State):
+    """
+    this class represents a board/state in the whip it game for the A-star algorithm
+    """
     def __init__(self, *, value, parent, free_space, start=0, goal=0):
         super(StateBoard, self).__init__(value, parent, start, goal)
         self.free_space = free_space
@@ -32,10 +47,7 @@ class StateBoard(State):
         return f'BoardState({self.value})'
 
     def __eq__(self, other):
-        if other == None:
-            return False
-
-        return self.value == other.value
+        return other is not None and (self.value == other.value)
 
     def __lt__(self, other):
         return self.get_f() < other.get_f()
@@ -53,6 +65,9 @@ class StateBoard(State):
         return f'BoardState({self.value})'
 
     def calculate_board_sums(self, *, board):
+        """
+        calculate board sums for a single board
+        """
         rows = [0 for _ in board]
         cols = [0 for _ in board[0]]
         for x in range(len(board)):
@@ -60,6 +75,23 @@ class StateBoard(State):
                 rows[x] += board[x][y]
                 cols[y] += board[x][y]
         return rows, cols
+
+    def calculate_all_board_sums(self):
+        """
+        calculate board sums for a all boards
+        """
+        vrows = (*(0 for _ in range(Board.H)),)
+        vcols = (*(0 for _ in range(Board.W)),)
+        grows = (*(0 for _ in range(Board.H)),)
+        gcols = (*(0 for _ in range(Board.W)),)
+
+        for y in range(Board.H):
+            for x in range(Board.W):
+                vrows = tuple(vrows[y] + self.value[y][x] if i == y else r for i, r in enumerate(vrows))
+                vcols = tuple(vcols[x] + self.value[y][x] if j == x else c for j, c in enumerate(vcols))
+                grows = tuple(grows[y] + self.value[y][x] if i == y else r for i, r in enumerate(grows))
+                gcols = tuple(gcols[x] + self.value[y][x] if j == x else c for j, c in enumerate(gcols))
+        return tuple(vrows, vcols, grows, gcols)
 
     def find_nearest(self, yi, xi):
         points = {}
