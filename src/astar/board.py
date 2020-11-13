@@ -5,13 +5,8 @@ this is an implementation of the A-star algorithm's state for a board of the whi
 import copy
 from queue import PriorityQueue
 from enum import IntEnum
-from collections import namedtuple
 
 from state import State
-
-Positiont = namedtuple('Position', ['y', 'x'])
-
-Distancet = namedtuple('Distance', ['g', 'h'])
 
 class Board(IntEnum):
     """
@@ -28,15 +23,9 @@ class StateBoard(State):
     """
     def __init__(self, *, value, parent, free_space, start=0, goal=0):
         super(StateBoard, self).__init__(value, parent, start, goal)
-        self.free_spacet = Positiont(free_space[0], free_space[1])
-        self.g = 0
-        self.h = 0
-        self.goal_row_sums, self.goal_col_sums = self.calculate_board_sums(
-            board=self.goal)
-        self.row_sums, self.col_sums = self.calculate_board_sums(
-            board=self.value)
+        self.distance = (parent.get_g() + 1 if parent else 0, self.get_h())
+        self.free_spacet = (free_space[0], free_space[1])
         self.make_vertical = True
-        self.get_f()
 
     def __repr__(self):
         return f'BoardState({self.value})'
@@ -65,11 +54,11 @@ class StateBoard(State):
         """
         rows = [0 for _ in board]
         cols = [0 for _ in board[0]]
-        for x in range(len(board)):
-            for y in range(len(board[0])):
+        for x in range(Board.H):
+            for y in range(Board.W):
                 rows[x] += board[x][y]
                 cols[y] += board[x][y]
-        return rows, cols
+        return ((*rows,), (*cols,))
 
     def calculate_all_board_sums(self):
         """
@@ -87,20 +76,6 @@ class StateBoard(State):
                 grows = tuple(grows[y] + self.value[y][x] if i == y else r for i, r in enumerate(grows))
                 gcols = tuple(gcols[x] + self.value[y][x] if j == x else c for j, c in enumerate(gcols))
         return tuple(vrows, vcols, grows, gcols)
-
-    def find_nearest(self, yi, xi):
-        points = {}
-        dist = 0
-        look_for = self.value[yi][xi]
-        for y, row in enumerate(self.goal):
-            for x, cell in enumerate(row):
-                if cell == look_for:
-                    dist = (abs(y - yi) << 2) + abs(x - xi)
-                    points[(y, x)] = dist
-        for p in points:
-            if p[1] < dist:
-                dist = p[1]
-        return dist
 
     def calc_h(self):
         averages = [0 for _ in range(4)]  # to keep the averages of each color
@@ -128,16 +103,9 @@ class StateBoard(State):
         return h
 
     def get_g(self):
-        if self.g != 0:
-            return self.g
-        if self.parent:
-            self.g = 1 + self.parent.g
-        return self.g
+        return self.distance[0]
 
     def get_h(self):
-        if self.h != 0:
-            return self.h # already calculated
-
         values = {-1: (), 0: (), 1: (), 2: (), 3: (), 4: ()}
         goalvs = {-1: (), 0: (), 1: (), 2: (), 3: (), 4: ()}
 
@@ -145,7 +113,7 @@ class StateBoard(State):
             for x in range(Board.W):
                 value = self.value[y][x]
                 goal = self.goal[y][x]
-                point = (y,x)
+                point = (y, x)
                 values[value] = (*values[value], point)
                 goalvs[goal] = (*goalvs[goal], point)
         manhattan = 0
@@ -159,15 +127,18 @@ class StateBoard(State):
                     tmp += abs(vlist[j][1] - glist[i][1])
             manhattan += tmp >> 2
 
+        goal_row_sums, goal_col_sums = self.calculate_board_sums(board=self.goal)
+        row_sums, col_sums           = self.calculate_board_sums(board=self.value)
+
         rows_diff = Board.H
-        for i, rs in enumerate(self.row_sums):
-            diff = abs(rs - self.goal_row_sums[i])
+        for i, rs in enumerate(row_sums):
+            diff = abs(rs - goal_row_sums[i])
             if diff == 0:
                 rows_diff -= 1
 
         cols_diff = Board.W
-        for i, cs in enumerate(self.col_sums):
-            diff = abs(cs - self.goal_col_sums[i])
+        for i, cs in enumerate(col_sums):
+            diff = abs(cs - goal_col_sums[i])
             if diff == 0:
                 cols_diff -= 1
 
@@ -176,12 +147,10 @@ class StateBoard(State):
             for j, cell in enumerate(row):
                 pos_diff -= 1 * (cell == self.goal[i][j])
 
-        self.h = manhattan + rows_diff + cols_diff + pos_diff
-
-        return self.h
+        return manhattan + rows_diff + cols_diff + pos_diff
 
     def get_f(self):
-        return self.get_g() + self.get_h()
+        return self.distance[0] + self.distance[1] # self.get_g() + self.get_h()
 
     def create_children(self, closed_set):
         for row in range(Board.H):
@@ -189,23 +158,10 @@ class StateBoard(State):
             tmp = self.rotate_row_right(row)
             if tmp not in closed_set and tmp not in self.children:
                 self.children = (*self.children, tmp)
-                #self.children.append(tmp)
             # insert child made by rotating a row to the left
             tmp = self.rotate_row_left(row)
             if tmp not in closed_set and tmp not in self.children:
-                #self.children.append(tmp)
                 self.children = (*self.children, tmp)
-        #for steps in range(Board.W):
-        #    # insert child made by moving the free space to the left # this is NOT valid in the toy
-        #    tmp = self.move_free_space_left(steps)
-        #    if tmp != None:
-        #        if tmp not in closed_set and tmp not in self.children:
-        #            self.children.append(tmp)
-        #    # insert child made by moving the free space to the right # this is NOT valid in the toy
-        #    tmp = self.move_free_space_right(steps)
-        #    if tmp != None:
-        #        if tmp not in closed_set and tmp not in self.children:
-        #            self.children.append(tmp)
 
         for steps in range(Board.H):
             if self.free_spacet[0] == 0:
@@ -214,7 +170,6 @@ class StateBoard(State):
             tmp = self.move_free_space_up(steps)
             if tmp != None:
                 if tmp not in closed_set:
-                    #self.children.append(tmp)
                     self.children = (*self.children, tmp)
         for steps in range(Board.H):
             if self.free_spacet[0] == Board.H - 1:
@@ -223,7 +178,6 @@ class StateBoard(State):
             tmp = self.move_free_space_down(steps)
             if tmp:
                 if tmp not in closed_set:
-                    #self.children.append(tmp)
                     self.children = (*self.children, tmp)
 
     def rotate_row_right(self, row):
@@ -233,12 +187,10 @@ class StateBoard(State):
             rotated_row[j] = self.value[row][i]
         nboard = copy.deepcopy(self.value)  # deep copy of the current value
         nboard[row] = rotated_row
-        y = self.free_spacet[0]
         x = self.free_spacet[1] + 1 * (self.free_spacet[0] == row)
         if x >= Board.W:
             x = 0
-        newp = Positiont(y,x)
-        return StateBoard(value=nboard, parent=self, start=self.start, goal=self.goal, free_space=newp)
+        return StateBoard(value=nboard, parent=self, start=self.start, goal=self.goal, free_space=(self.free_spacet[0], x))
 
     def rotate_row_left(self, row):
         rotated_row = [0 for _ in range(Board.W)]
@@ -247,12 +199,10 @@ class StateBoard(State):
             rotated_row[j] = self.value[row][i]
         nboard = copy.deepcopy(self.value)  # deep copy of the current value
         nboard[row] = rotated_row
-        y = self.free_spacet[0]
         x = self.free_spacet[1] - 1 * (self.free_spacet[0] == row)
         if x < 0:
             x = Board.W - 1
-        newp = Positiont(y,x)
-        return StateBoard(value=nboard, parent=self, start=self.start, goal=self.goal, free_space=newp)
+        return StateBoard(value=nboard, parent=self, start=self.start, goal=self.goal, free_space=(self.free_spacet[0], x))
 
     def move_free_space_down(self, steps):
         row = self.free_spacet[0]
@@ -266,10 +216,7 @@ class StateBoard(State):
             tmp = nboard[row+i+1][col]
             nboard[row+i+1][col] = nboard[row+i][col]
             nboard[row+i][col] = tmp
-        y = row + steps
-        x = col
-        newp = Positiont(y,x)
-        return StateBoard(value=nboard, parent=self, start=self.start, goal=self.goal, free_space=newp)
+        return StateBoard(value=nboard, parent=self, start=self.start, goal=self.goal, free_space=(row + steps, col))
 
     def move_free_space_up(self, steps):
         row = self.free_spacet[0]
@@ -287,10 +234,7 @@ class StateBoard(State):
                 return None
             nboard[row - i][col] = nboard[row - i - 1][col]
             nboard[row - i - 1][col] = tmp
-        y = row - steps
-        x = col
-        newp = Positiont(y,x)
-        return StateBoard(value=nboard, parent=self, start=self.start, goal=self.goal, free_space=newp)
+        return StateBoard(value=nboard, parent=self, start=self.start, goal=self.goal, free_space=(row - steps, col))
 
     def move_free_space_left(self, steps):
         row = self.free_spacet[0]
@@ -302,10 +246,7 @@ class StateBoard(State):
             tmp = nboard[row][col-i]
             nboard[row][col-i] = nboard[row][col-i-1]
             nboard[row][col-i-1] = tmp
-        y = row
-        x = col - steps
-        newp = Positiont(y,x)
-        return StateBoard(value=nboard, parent=self, start=self.start, goal=self.goal, free_space=newp)
+        return StateBoard(value=nboard, parent=self, start=self.start, goal=self.goal, free_space=(row, col - steps))
 
     def move_free_space_right(self, steps):
         row = self.free_spacet[0]
@@ -317,10 +258,7 @@ class StateBoard(State):
             tmp = nboard[row][col+i]
             nboard[row][col+i] = nboard[row][col+i+1]
             nboard[row][col+i+1] = tmp
-        y = row
-        x = col + steps
-        newp = Positiont(y,x)
-        return StateBoard(value=nboard, parent=self, start=self.start, goal=self.goal, free_space=newp)
+        return StateBoard(value=nboard, parent=self, start=self.start, goal=self.goal, free_space=(row, col + steps))
 
 def get_state_distance(state):
     return state.get_f()
@@ -336,22 +274,21 @@ class BoardSolver:
         self.path = []
         self.start = start
         self.goal = goal
-        self.free_space = Positiont(y, x)
-        newp = Positiont(y,x)
-
-    def solve(self):
+        self.free_space = (y, x)
         self.open_set = PriorityQueue()
         self.closed_set = ()
 
+    def solve(self):
+
         start_state = StateBoard(value=self.start, parent=None, free_space=self.free_space, start=self.start, goal=self.goal)
 
-        self.open_set.put((start_state.get_f(), start_state.g, start_state))
+        self.open_set.put((start_state.get_f(), start_state.get_g(), start_state))
 
         i = 0
         while not self.open_set.empty():
             curr = self.open_set.get()[2]
             if i % 0x80 == 0:
-                print(f'curr: {curr}, f:{curr.get_f():04d}, g:{curr.g:03d}, h:{curr.h:03d}')
+                print(f'curr: {curr}, f:{curr.get_f():04d}, g:{curr.get_g():03d}, h:{curr.get_h():03d}')
             self.closed_set = (*self.closed_set, curr)
 
             if curr.value == self.goal:
@@ -365,7 +302,7 @@ class BoardSolver:
                 if child.value == self.goal:
                     self.path = child.path
                     return  # this here, it's extremely important
-                self.open_set.put((child.get_f(), child.g, child))
+                self.open_set.put((child.get_f(), child.get_g(), child))
                 i += 1
 
         if not self.path:
