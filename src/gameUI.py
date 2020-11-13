@@ -1,6 +1,8 @@
+#!/usr/bin/env python3
+# -*- coding: utf8 -*-
+
 import threading
 import time
-
 
 from PySide2.QtCore import *
 
@@ -10,9 +12,10 @@ from Astar import *
 from UI import UIMain
 from UI.UIMain import Colors
 
+from astar.state import *
+from astar.board import *
 
 from game import *
-
 
 class UI(UIMain.Ui_MainWindow, QMainWindow):
     sendRedrawBoard = Signal()
@@ -79,7 +82,10 @@ class UI(UIMain.Ui_MainWindow, QMainWindow):
         if not self.solved:
             current_board = tuple(tuple(i) for i in self.game._board)
             final_board = tuple(tuple(i) for i in self.game._final_board)
-            self.solution = AStar().astar(current_board, final_board, False)
+            solver = BoardSolver(start=current_board, goal=final_board)
+            solver.solve()
+            self.solution = solver.path
+            #self.solution = AStar().astar(current_board, final_board, False)
             if self.solution != None:
                 self.solved = True
                 self.last_step = len(self.solution)
@@ -203,7 +209,6 @@ class UI(UIMain.Ui_MainWindow, QMainWindow):
                 return False
         else:
             return True
-
 
 if __name__ == '__main__':
     app = QApplication()

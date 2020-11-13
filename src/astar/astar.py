@@ -2,7 +2,7 @@
 this is an implementation of the A-star algorithm
 """
 
-from board import BoardSolver
+from board import *
 
 def main():
     """
@@ -72,17 +72,8 @@ def main():
     print(f'new start: {start}')
     print(f'new goal: {goal}')
 
-    initial_y, initial_x = 0, 0
-    for i, row in enumerate(start):
-        for j, cell in enumerate(row):
-            if cell == 0:
-                initial_y, initial_x = i, j
-                break
-        else:
-            continue
-        break
     # x = start's free space's col, same for initial_y
-    board_solver = BoardSolver(start=start, goal=goal, x=initial_x, y=initial_y)
+    board_solver = BoardSolver(start=start, goal=goal)
     board_solver.solve()
     print('the path is')
     for i, state in enumerate(board_solver.path):
