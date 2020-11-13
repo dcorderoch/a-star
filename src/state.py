@@ -1,6 +1,3 @@
-import copy
-
-
 class State(object):
     def __init__(self, value, parent, start=0, goal=0):
         self.children = []
@@ -10,8 +7,7 @@ class State(object):
         if parent:
             self.start = parent.start
             self.goal = parent.goal
-            self.path = copy.deepcopy(parent.path)
-            self.path.append(value)
+            self.path = (*parent.path, value)
         else:
             self.path = [value]
             self.start = start
