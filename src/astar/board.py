@@ -166,39 +166,47 @@ class StateBoard(State):
         for steps in range(Board.H):
             if self.free_spacet[0] == 0:
                 break
+            row = self.free_spacet[0]
+            col = self.free_spacet[1]
+            if row == 0 or row - steps < 0:
+                continue
+            if self.value[row - 1][col] == -1:
+                continue
+            if self.value[row - steps][col] == -1:
+                continue
             # insert child made by moving the free space up
             tmp = self.move_free_space_up(steps)
-            if tmp != None:
-                if tmp not in closed_set:
-                    self.children = (*self.children, tmp)
+            if tmp not in closed_set:
+                self.children = (*self.children, tmp)
         for steps in range(Board.H):
             if self.free_spacet[0] == Board.H - 1:
                 break
+            row = self.free_spacet[0]
+            col = self.free_spacet[1]
+            if row == Board.H - 1 or row + steps >= Board.H:
+                continue
+            if row + steps >= Board.H:
+                continue
             # insert child made by moving the free space down
             tmp = self.move_free_space_down(steps)
-            if tmp:
-                if tmp not in closed_set:
-                    self.children = (*self.children, tmp)
+            if tmp not in closed_set:
+                self.children = (*self.children, tmp)
 
     def rotate_row_right(self, row):
-        rotated_row = [0 for _ in range(Board.W)]
-        for i in range(Board.W):
-            j = 0 if i == Board.W - 1 else i + 1
-            rotated_row[j] = self.value[row][i]
-        nboard = copy.deepcopy(self.value)  # deep copy of the current value
-        nboard[row] = rotated_row
+        nboard = self.value
+        vrow = nboard[row]
+        rotated_row = vrow[-1:] + vrow[0:-1]
+        nboard = (*nboard[:row], rotated_row, *nboard[row+1:])
         x = self.free_spacet[1] + 1 * (self.free_spacet[0] == row)
         if x >= Board.W:
             x = 0
         return StateBoard(value=nboard, parent=self, start=self.start, goal=self.goal, free_space=(self.free_spacet[0], x))
 
     def rotate_row_left(self, row):
-        rotated_row = [0 for _ in range(Board.W)]
-        for i in range(Board.W - 1, -1, -1):
-            j = Board.W - 1 if i == 0 else i - 1
-            rotated_row[j] = self.value[row][i]
-        nboard = copy.deepcopy(self.value)  # deep copy of the current value
-        nboard[row] = rotated_row
+        nboard = self.value
+        vrow = nboard[row]
+        rotated_row = vrow[1:] + vrow[0:1]
+        nboard = (*nboard[:row], rotated_row, *nboard[row+1:])
         x = self.free_spacet[1] - 1 * (self.free_spacet[0] == row)
         if x < 0:
             x = Board.W - 1
@@ -207,58 +215,26 @@ class StateBoard(State):
     def move_free_space_down(self, steps):
         row = self.free_spacet[0]
         col = self.free_spacet[1]
-        if row == Board.H - 1 or row + steps >= Board.H:
-            return None
-        if row + steps >= Board.H:
-            return None
-        nboard = copy.deepcopy(self.value)
+        nboard = [list(x) for x in self.value]
         for i in range(steps):
             tmp = nboard[row+i+1][col]
             nboard[row+i+1][col] = nboard[row+i][col]
             nboard[row+i][col] = tmp
+        nboard = tuple(tuple(x) for x in nboard)
         return StateBoard(value=nboard, parent=self, start=self.start, goal=self.goal, free_space=(row + steps, col))
 
     def move_free_space_up(self, steps):
         row = self.free_spacet[0]
         col = self.free_spacet[1]
-        if row == 0 or row - steps < 0:
-            return None
-        if self.value[row - 1][col] == -1:
-            return None
-        if self.value[row - steps][col] == -1:
-            return None
-        nboard = copy.deepcopy(self.value)
+        nboard = [list(x) for x in self.value]
         for i in range(steps):
             tmp = nboard[row - i][col]
             if nboard[row - i - 1][col] == -1:
                 return None
             nboard[row - i][col] = nboard[row - i - 1][col]
             nboard[row - i - 1][col] = tmp
+        nboard = tuple(tuple(x) for x in nboard)
         return StateBoard(value=nboard, parent=self, start=self.start, goal=self.goal, free_space=(row - steps, col))
-
-    def move_free_space_left(self, steps):
-        row = self.free_spacet[0]
-        col = self.free_spacet[1]
-        if col - steps < 0:
-            return None
-        nboard = copy.deepcopy(self.value)
-        for i in range(steps):
-            tmp = nboard[row][col-i]
-            nboard[row][col-i] = nboard[row][col-i-1]
-            nboard[row][col-i-1] = tmp
-        return StateBoard(value=nboard, parent=self, start=self.start, goal=self.goal, free_space=(row, col - steps))
-
-    def move_free_space_right(self, steps):
-        row = self.free_spacet[0]
-        col = self.free_spacet[1]
-        if col + steps >= Board.W:
-            return None
-        nboard = copy.deepcopy(self.value)
-        for i in range(steps):
-            tmp = nboard[row][col+i]
-            nboard[row][col+i] = nboard[row][col+i+1]
-            nboard[row][col+i+1] = tmp
-        return StateBoard(value=nboard, parent=self, start=self.start, goal=self.goal, free_space=(row, col + steps))
 
 def get_state_distance(state):
     return state.get_f()
