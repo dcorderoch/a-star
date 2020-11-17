@@ -169,6 +169,8 @@ class AStar:
         res.append(tuple(r3))
         res.append(tuple(l4))
         res.append(tuple(r4))
+        res.append(tuple(l0))
+        res.append(tuple(r0))
 
         matrix_dim = len(node[0])
 

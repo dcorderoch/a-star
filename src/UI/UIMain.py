@@ -184,7 +184,7 @@ class Ui_MainWindow(object):
         self.btnFirstStep = QPushButton(self.centralwidget)
         self.btnFirstStep.setObjectName(u"btnFirstStep")
         self.btnFirstStep.setGeometry(QRect(590, 860, 111, 31))
-        self.btnFirstStep.setEnabled(False)
+        self.btnFirstStep.setEnabled(True)
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
@@ -283,7 +283,7 @@ class Ui_MainWindow(object):
             "MainWindow", u"Paso Anterior", None))
 
         self.btnFirstStep.setText(QCoreApplication.translate(
-            "MainWindow", u"Paso Inicial", None))
+            "MainWindow", u"Reset", None))
     # retranslateUi
 
     # Mostrar las instrucciones
@@ -315,7 +315,12 @@ class Ui_MainWindow(object):
         msg.setText("Posibles Movimientos")
         msg.setInformativeText(
             "1) Rotar Derecha: Desplaza a la derecha un espacio cada pieza en una fila\n"
-            "2) Rotar Izquierda: Desplazar a la Izquierda un espacio cada pieza en una fila\n"
-            "3) Desplazamiento Vertical: Desplazar el espacio en blanco de manera vertical 1,2,3 o 4 espacios (Columnas)")
+            "2) Rotar Izquierda: Desplaza a la izquierda un espacio cada pieza en una fila\n\n"
+            "3) Desplazamiento Vertical: Desplazar el espacio en blanco de manera vertical 1,2,3 o 4 espacios (Columnas)\n"
+            "Se puede hacer click en una posición que se encuentre en la misma columna o fila que el espacio en blanco\n"
+            " para hacer a este moverse hacia esa posición, ya sea mediante la rotación o el desplazaiento vertical\n"
+            "Para obtener la solución el juego se utiliza el botón Resolver, despu's de esto los botones para moverse\n"
+            "por la solución se habilitarán\n"
+            "Paa salir de la solución simplemente ejecute cualquier otro movimiento en el tablero")
         msg.setWindowTitle("Instrucciones de Juego")
         ret = msg.exec_()

@@ -1,7 +1,9 @@
 import threading
 import time
 
+
 from PySide2.QtCore import *
+
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 from Astar import *
@@ -13,10 +15,13 @@ from game import *
 
 
 class UI(UIMain.Ui_MainWindow, QMainWindow):
+    sendRedrawBoard = Signal()
+
     def __init__(self):
         super(UI, self).__init__()
         self.setupUi(self)
         self.setButtonHandlers()
+        self.sendRedrawBoard.connect(self.redrawBoard)
         self.game = Game()
         self.token_colors = {Board.TOKEN1: Colors.red, Board.TOKEN2: Colors.green,
                              Board.TOKEN3: Colors.blue, Board.TOKEN4: Colors.yellow,
@@ -54,17 +59,20 @@ class UI(UIMain.Ui_MainWindow, QMainWindow):
                     lambda row=y, col=x: self.boardBtnHandler(row, col))
 
     def leftBtnHandler(self, row):
-        self.game.rotateRowLeft(row)
-        self.redrawBoard()
+        if self.confirm_solve_cancel():
+            self.game.rotateRowLeft(row)
+            self.redrawBoard()
 
     def rightBtnHandler(self, row):
-        self.game.rotateRowRight(row)
-        self.redrawBoard()
+        if self.confirm_solve_cancel():
+            self.game.rotateRowRight(row)
+            self.redrawBoard()
 
     def boardBtnHandler(self, row, col):
-        print(row, col)
-        self.game.moveFreeSpace(row, col)
-        self.redrawBoard()
+        if self.confirm_solve_cancel():
+            self.game.moveFreeSpace(row, col)
+            self.redrawBoard()
+
     # sets the right color on the respective button
 
     def resolveBtnHandler(self):
@@ -78,26 +86,34 @@ class UI(UIMain.Ui_MainWindow, QMainWindow):
 
                 self.btnNextStep.setEnabled(True)
                 self.btnPlaySolution.setEnabled(True)
+                self.btnFirstStep.setText("Paso Inicial")
+                self.btnFirstStep.setEnabled(False)
             else:
                 print("no solucionó nada")
-        pass
+
+    def setWhiteSpacePos(self):
+        for y, row in enumerate(self.game._board):
+            for x, value in enumerate(row):
+                if value == 0:
+                    self.game._free_space.row = y
+                    self.game._free_space.col = x
+                    return
 
     def stepAheadSolution(self):
         self.curr_step += 1
         current_step_board = self.solution[self.curr_step]
         self.game._board = [list(i) for i in current_step_board]
-
-        self.redrawBoard()
-
-        pass
+        self.setWhiteSpacePos()
+        # self.redrawBoard()
+        self.sendRedrawBoard.emit()
 
     def stepBackSolution(self):
         self.curr_step -= 1
         current_step_board = self.solution[self.curr_step]
         self.game._board = [list(i) for i in current_step_board]
+        self.setWhiteSpacePos()
 
-        self.redrawBoard()
-        pass
+        self.sendRedrawBoard.emit()
 
     def restartSteps(self):
         if self.solved and self.curr_step != 0:
@@ -105,8 +121,12 @@ class UI(UIMain.Ui_MainWindow, QMainWindow):
             current_step_board = self.solution[self.curr_step]
             self.game._board = [list(i) for i in current_step_board]
 
-            self.redrawBoard()
-        pass
+            # self.redrawBoard()
+            self.sendRedrawBoard.emit()
+        else:
+            self.game._board = [list(i) for i in self.game._final_board]
+            self.sendRedrawBoard.emit()
+        self.setWhiteSpacePos()
 
     def playSolutionBtnHandler(self):
         if not self.playing_solution:
@@ -121,20 +141,20 @@ class UI(UIMain.Ui_MainWindow, QMainWindow):
             self.btnPlaySolution.setText(QCoreApplication.translate(
                 "MainWindow", u"Play", None))
 
-        pass
-
     def playSolution(self):
         while self.curr_step < self.last_step-1 and self.playing_solution:
+            time.sleep(1)
             self.stepAheadSolution()
-            time.sleep(1.5)
-        self.playing_solution = False
+
+        if self.curr_step == self.last_step:
+            self.playing_solution = False
 
     def redrawBoard(self):
-
         # manage buttons
         if self.solved:
             if self.curr_step == self.last_step - 1:
                 self.btnNextStep.setEnabled(False)
+                print(self.game._board)
             else:
                 self.btnNextStep.setEnabled(True)
 
@@ -151,11 +171,38 @@ class UI(UIMain.Ui_MainWindow, QMainWindow):
                     self.token_colors[self.game._board[y][x]])
 
         self.show()
-        pass
 
     def shuffleBtnHandler(self):
-        self.game.shuffle()
-        self.redrawBoard()
+        if self.confirm_solve_cancel():
+            self.game.shuffle()
+            self.setWhiteSpacePos()
+            self.redrawBoard()
+
+    def confirm_solve_cancel(self):
+        if self.solved == True:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Information)
+            msg.setText("¿Desea continuar con el movimiento?")
+            msg.setInformativeText(
+                "Si mueve alguna pieza mientras se muestra el resultado, deberá calcular la solución una vez más.")
+            msg.setWindowTitle("Confirmar movimiento")
+            yes_button = msg.addButton(
+                "Ejecutar Movimiento", QMessageBox.YesRole)
+            msg.addButton("Volver a Solución", QMessageBox.NoRole)
+
+            ret = msg.exec_()
+            if msg.clickedButton() == yes_button:
+                self.solved = False
+                self.btnNextStep.setEnabled(False)
+                self.btnPlaySolution.setEnabled(False)
+                self.btnPreviousStep.setEnabled(False)
+                self.btnFirstStep.setEnabled(True)
+                self.btnFirstStep.setText("Reset")
+                return True
+            else:
+                return False
+        else:
+            return True
 
 
 if __name__ == '__main__':
