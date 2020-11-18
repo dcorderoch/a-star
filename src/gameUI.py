@@ -17,6 +17,7 @@ from astar.board import *
 
 from game import *
 
+
 class UI(UIMain.Ui_MainWindow, QMainWindow):
     sendRedrawBoard = Signal()
 
@@ -60,6 +61,12 @@ class UI(UIMain.Ui_MainWindow, QMainWindow):
             for x in range(Board.WIDTH):
                 self.board_buttons[y][x].clicked.connect(
                     lambda row=y, col=x: self.boardBtnHandler(row, col))
+
+        self.btnLoadInitialConfig.clicked.connect(lambda:
+                                                  self.btnLoadFileHandler("init"))
+        self.btnLoadFinalConfig.clicked.connect(lambda:
+                                                self.btnLoadFileHandler("goal"))
+        self.btnSaveFile.clicked.connect(self.btnSaveFileHandler)
 
     def leftBtnHandler(self, row):
         if self.confirm_solve_cancel():
@@ -178,6 +185,14 @@ class UI(UIMain.Ui_MainWindow, QMainWindow):
 
         self.show()
 
+    def btnLoadFileHandler(self, boardType):
+        self.game.loadFile(self, boardType)
+        self.redrawBoard()
+
+    def btnSaveFileHandler(self):
+        self.game.saveFile()
+        print("Saving file")
+
     def shuffleBtnHandler(self):
         if self.confirm_solve_cancel():
             self.game.shuffle()
@@ -209,6 +224,7 @@ class UI(UIMain.Ui_MainWindow, QMainWindow):
                 return False
         else:
             return True
+
 
 if __name__ == '__main__':
     app = QApplication()
