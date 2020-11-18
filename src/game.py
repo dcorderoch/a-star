@@ -139,7 +139,7 @@ class Game():
                                 "Error: Se encontro un valor invalido: " + str(column), ui)
                             return False
 
-            if counter["4"] != 4 or counter["1"] != 4 or counter["2"] != 4 or counter["3"] != 4:
+            if counter["1"] != 4 or counter["2"] != 4 or counter["3"] != 4 or counter["4"] != 4:
                 self.reading_error(
                     "Error: No hay la cantidad requerida de bolas por color en la configuracion dada. Tienen que haber exactamente 4 elementos por cada color.", ui)
                 return False
